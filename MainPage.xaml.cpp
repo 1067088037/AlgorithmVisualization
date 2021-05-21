@@ -5,6 +5,8 @@
 
 #include "pch.h"
 #include "MainPage.xaml.h"
+#include "HomePage.xaml.h"
+#include "SortAlgoPage.xaml.h"
 
 using namespace AlgorithmVisualization;
 
@@ -24,4 +26,33 @@ using namespace Windows::UI::Xaml::Navigation;
 MainPage::MainPage()
 {
 	InitializeComponent();
+}
+
+
+void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(0);
+	ContentFrame->Navigate((Type^)HomePage::typeid);
+}
+
+
+void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml::Controls::NavigationView^ sender, Windows::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
+{
+	if (args->IsSettingsInvoked)
+	{
+
+	}
+	else
+	{
+		auto tag = args->InvokedItemContainer->Tag->ToString();
+		Type^ navigateTarget;
+		if (tag == "home") {
+			navigateTarget = HomePage::typeid;
+		}
+		else if (tag == "sort")
+		{
+			navigateTarget = SortAlgoPage::typeid;
+		}
+		ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo);
+	}
 }

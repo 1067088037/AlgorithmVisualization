@@ -9,6 +9,23 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <NavigationView x:Name="MainNavView"
+                        Loaded="MainNavView_Loaded"
+                        ItemInvoked="MainNavView_ItemInvoked"
+                        IsBackButtonVisible="Collapsed">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="home" Icon="Home" Content="主页" />
+                <NavigationViewItemSeparator />
+                <NavigationViewItem Tag="sort" Content="排序算法">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8CB;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
 
+            <ScrollViewer>
+                <Frame x:Name="ContentFrame" Padding="12 0 12 24" />
+            </ScrollViewer>
+        </NavigationView>
     </Grid>
 </Page>

@@ -17,5 +17,8 @@ namespace AlgorithmVisualization
 	public:
 		MainPage();
 
+	private:
+		void MainNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void MainNavView_ItemInvoked(Windows::UI::Xaml::Controls::NavigationView^ sender, Windows::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args);
 	};
 }
