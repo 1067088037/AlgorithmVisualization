@@ -17,5 +17,6 @@ namespace AlgorithmVisualization
 	{
 	public:
 		SortAlgoPage();
+	private:
 	};
 }

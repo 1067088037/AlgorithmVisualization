@@ -25,3 +25,4 @@ SortAlgoPage::SortAlgoPage()
 {
 	InitializeComponent();
 }
+

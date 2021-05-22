@@ -24,7 +24,7 @@
             </NavigationView.MenuItems>
 
             <ScrollViewer>
-                <Frame x:Name="ContentFrame" Padding="12 0 12 24" />
+                <Frame x:Name="ContentFrame" />
             </ScrollViewer>
         </NavigationView>
     </Grid>

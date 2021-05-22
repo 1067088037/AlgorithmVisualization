@@ -49,4 +49,7 @@
     <Page Include="HomePage.xaml" />
     <Page Include="SortAlgoPage.xaml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
