@@ -28,17 +28,17 @@ MainPage::MainPage()
 	InitializeComponent();
 }
 
-
+// 主页导航加载完成时回调
 void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(0);
 	ContentFrame->Navigate((Type^)HomePage::typeid);
 }
 
-
+// 主页导航的Item被点击时回调
 void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml::Controls::NavigationView^ sender, Windows::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
-	if (args->IsSettingsInvoked)
+	if (args->IsSettingsInvoked) //当设置被点击
 	{
 
 	}
@@ -53,6 +53,6 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 		{
 			navigateTarget = SortAlgoPage::typeid;
 		}
-		ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo);
+		ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo); //导航到相应页面
 	}
 }
