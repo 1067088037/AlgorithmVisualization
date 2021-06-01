@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="bd094c1f-8e91-41c4-814a-db1264f5dc5d"
-    Publisher="CN=QQ106"
-    Version="1.0.0.0" />
+    Name="52897Summer-lights.34423B707E245"
+    Publisher="CN=40F3F223-D910-44D2-8027-FD5A474C043A"
+    Version="1.0.1.0" />
 
-  <mp:PhoneIdentity PhoneProductId="bd094c1f-8e91-41c4-814a-db1264f5dc5d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="910618dd-05c8-4f17-8a42-84a15b3a70b0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>AlgorithmVisualization</DisplayName>
-    <PublisherDisplayName>QQ106</PublisherDisplayName>
+    <DisplayName>算法可视化</DisplayName>
+    <PublisherDisplayName>Summer-lights</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="AlgorithmVisualization.App">
       <uap:VisualElements
-        DisplayName="AlgorithmVisualization"
+        DisplayName="算法可视化"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="AlgorithmVisualization"

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "SortAlgoPage.g.h"
+#include "Histogram.h"
 
 namespace AlgorithmVisualization
 {
@@ -20,5 +21,8 @@ namespace AlgorithmVisualization
 	private:
 		void SortNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void SortNavView_ItemInvoked(Microsoft::UI::Xaml::Controls::NavigationView^ sender, Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args);
+
+		Histogram^ histogram;
+		void Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 	};
 }

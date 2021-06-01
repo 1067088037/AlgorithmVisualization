@@ -39,8 +39,32 @@
                     </muxc:NavigationViewItem.MenuItems>
                 </muxc:NavigationViewItem>
             </muxc:NavigationView.MenuItems>
+
             <ScrollViewer>
-                <Frame x:Name="SortFrame" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="500" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1000" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="6">
+                        <TextBlock FontSize="28">柱状图</TextBlock>
+                        <Button Content="调试" Click="Button_Click"></Button>
+                        <StackPanel x:Name="SortHistogram" Margin="6" Orientation="Horizontal" VerticalAlignment="Bottom">
+
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="SortArray" Grid.Row="1" Grid.Column="0" Margin="6">
+                        <TextBlock FontSize="28">数组</TextBlock>
+                    </StackPanel>
+                    <StackPanel x:Name="SortDetail" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6">
+                        <TextBlock FontSize="28">详情</TextBlock>
+                    </StackPanel>
+                </Grid>
             </ScrollViewer>
         </muxc:NavigationView>
     </Grid>
