@@ -2,28 +2,78 @@
 
 #include <collection.h>
 
+using namespace Platform;
 using namespace Platform::Collections;
 using namespace Windows::Foundation::Collections;
 using namespace Windows::UI;
 
 namespace AlgorithmVisualization {
 	/// <summary>
+	/// 柱体的状态
+	/// </summary>
+	public enum class PillarState
+	{
+		Default = 0, //默认状态
+		Swapping = 1, //正在交换状态
+		Compared = 2, //正在比较状态
+		Completed = 3 //已完成
+	};
+
+	/// <summary>
+	/// 柱体类
+	/// </summary>
+	public ref class Pillar sealed
+	{
+	public:
+		Pillar(int _number, int width, int height, Color color); //构造函数
+		Windows::UI::Xaml::Controls::StackPanel^ getView(); //获取视图
+		void resize(int _width, int _height); //重新设置尺寸
+
+		property int number; //代表的数字
+		
+	private:
+		Windows::UI::Xaml::Controls::StackPanel^ outBox;//最外侧的盒子
+		Windows::UI::Xaml::Shapes::Rectangle^ rect; //柱体中的矩形
+		Windows::UI::Xaml::Controls::TextBlock^ textBlock; //柱体中的文字
+		
+		const int margin = 4; //边界
+		const int textHeight = 20; //文本高度
+	};
+
+	/// <summary>
 	/// 柱状图绘制类
 	/// </summary>
 	public ref class Histogram sealed
 	{
 	public:
-		Histogram(Windows::UI::Xaml::Controls::Panel^ container);
+		Histogram();
 		void load(IVector<int>^ numbers); //绘制柱状图
 		void swap(int left, int right); //交换两个柱体的位置
+		void swapOnUI(int left, int right); //在UI线程交换两个柱体的位置并设置状态
+		void compareOnUI(int left, int right); //在UI线程展示比较两个柱体
 		void setColor(int index, Windows::UI::Color color); //设置矩形的颜色
-		void select(int index, bool selected);
-	
+		void setState(int index, PillarState state); //设置柱体的状态
+		void setStateOnUI(int index, PillarState state); //在UI线程设置单个柱体的状态
+		void setStatesOnUI(IVector<int>^ indexs, IVector<PillarState>^ states); //批量设置柱体状态
+		void onSizeChanged(float _width, float _height); //当界面尺寸改变时
+
+		property Windows::UI::Xaml::Controls::StackPanel^ container; //用来盛放柱状图的容器
+
+		Pillar^ getOne()
+		{
+			return pillars->GetAt(0);
+		};
+
 	private:
-		Windows::UI::Xaml::Controls::Panel^ container; //用来盛放柱状图的容器
-		double width = 1000.0;
-		double height = 500.0;
-		Color selectedColor = Windows::UI::Colors::OrangeRed;
-		Color unselectedColor = Windows::UI::Colors::Blue;
+		int maxNumber = 0;
+		Vector<Pillar^>^ pillars;
+
+		float width = 980.0;
+		float height = 350.0;
+		
+		Color DefaultColor = Colors::Blue;
+		Color SwappingColor = Colors::Red;
+		Color ComparedColor = Colors::Green;
+		Color CompletedColor = Colors::Yellow;
 	};
 }

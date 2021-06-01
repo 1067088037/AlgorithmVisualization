@@ -7,6 +7,9 @@
 
 #include "SortAlgoPage.g.h"
 #include "Histogram.h"
+#include <vector>
+
+using namespace std;
 
 namespace AlgorithmVisualization
 {
@@ -19,10 +22,13 @@ namespace AlgorithmVisualization
 	public:
 		SortAlgoPage();
 	private:
+		Histogram^ histogram; //柱状图
+		vector<int> sortVector; //要排序的向量
+
 		void SortNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void SortNavView_ItemInvoked(Microsoft::UI::Xaml::Controls::NavigationView^ sender, Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args);
-
-		Histogram^ histogram;
 		void Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void SortHistogram_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
+		void SortHistogramStack_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
 	};
 }

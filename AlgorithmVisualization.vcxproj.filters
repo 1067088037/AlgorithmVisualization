@@ -19,6 +19,7 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Histogram.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
@@ -54,5 +55,8 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Package.StoreAssociation.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AlgorithmVisualization.rc" />
   </ItemGroup>
 </Project>
