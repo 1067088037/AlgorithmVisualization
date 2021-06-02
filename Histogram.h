@@ -69,7 +69,7 @@ namespace AlgorithmVisualization {
 		Vector<Pillar^>^ pillars;
 
 		float width = 980.0;
-		float height = 350.0;
+		float height = 380.0;
 		
 		Color DefaultColor = Colors::Blue;
 		Color SwappingColor = Colors::Red;

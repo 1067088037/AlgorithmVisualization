@@ -172,7 +172,7 @@ void AlgorithmVisualization::Histogram::setStatesOnUI(IVector<int>^ indexs, IVec
 {
 	CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High, ref new DispatchedHandler([this, indexs, states]()
 		{
-			for (int i = 0; i < indexs->Size; i++)
+			for (unsigned int i = 0; i < indexs->Size; i++)
 			{
 				setState(indexs->GetAt(i), states->GetAt(i));
 			}

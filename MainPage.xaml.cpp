@@ -46,12 +46,23 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 	{
 		auto tag = args->InvokedItemContainer->Tag->ToString();
 		Type^ navigateTarget;
-		if (tag == "home") {
+		if (tag == "Home") {
 			navigateTarget = HomePage::typeid;
 		}
-		else if (tag == "sort")
+		else if (tag == "PrimarySort")
 		{
 			navigateTarget = SortAlgoPage::typeid;
+			((App^)Application::Current)->sortAlgorithmType = 0;
+		}
+		else if (tag == "AdvancedComparativeSort")
+		{
+			navigateTarget = SortAlgoPage::typeid;
+			((App^)Application::Current)->sortAlgorithmType = 1;
+		}
+		else if (tag == "AdvancedNonComparativeSort")
+		{
+			navigateTarget = SortAlgoPage::typeid;
+			((App^)Application::Current)->sortAlgorithmType = 2;
 		}
 		ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo); //导航到相应页面
 	}

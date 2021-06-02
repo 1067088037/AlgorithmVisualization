@@ -16,7 +16,17 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="home" Icon="Home" Content="主页" />
                 <NavigationViewItemSeparator />
-                <NavigationViewItem Tag="sort" Content="排序算法">
+                <NavigationViewItem Tag="PrimarySort" Content="初等排序">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8CB;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="AdvancedComparativeSort" Content="高等比较排序">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8CB;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="AdvancedNonComparativeSort" Content="高等非比较排序">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8CB;" />
                     </NavigationViewItem.Icon>

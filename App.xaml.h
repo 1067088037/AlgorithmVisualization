@@ -14,6 +14,9 @@ namespace AlgorithmVisualization
 	/// </summary>
 	ref class App sealed
 	{
+	public:
+		property int sortAlgorithmType;
+	
 	protected:
 		virtual void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e) override;
 
