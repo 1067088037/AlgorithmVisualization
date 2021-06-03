@@ -7,6 +7,7 @@
 #include "SortAlgoPage.xaml.h"
 #include "Histogram.h"
 #include <vector>
+#include "ExecuteStep.h"
 
 using namespace AlgorithmVisualization;
 
@@ -64,7 +65,7 @@ SortAlgoPage::SortAlgoPage()
 
 	sortVector.clear();
 	auto vec = ref new Vector<int>();
-	int size = 12;
+	int size = 16;
 	for (int i = 0; i < size; ++i)
 	{
 		int value = rand() % 99 + 1;

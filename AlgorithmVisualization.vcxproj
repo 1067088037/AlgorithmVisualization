@@ -189,6 +189,7 @@
     <ClInclude Include="SortAlgoPage.xaml.h">
       <DependentUpon>SortAlgoPage.xaml</DependentUpon>
     </ClInclude>
+    <ClInclude Include="ExecuteStep.h" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -242,6 +243,7 @@
     <ClCompile Include="SortAlgoPage.xaml.cpp">
       <DependentUpon>SortAlgoPage.xaml</DependentUpon>
     </ClCompile>
+    <ClCompile Include="ExecuteStep.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
