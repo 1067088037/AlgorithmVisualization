@@ -20,9 +20,8 @@ namespace AlgorithmVisualization {
 	public ref class SingleStep sealed
 	{
 	public:
-		SingleStep(int index, int type); //构造函数
+		SingleStep(int type); //构造函数
 		
-		property int Index; //步骤的编号
 		property int Type; //步骤的类型
 		property IVector<IVector<int>^>^ ThisState; //当前步骤的状态
 		property IVector<ExcuteInstruct^>^ ToNextStep; //运转到下一步的过程

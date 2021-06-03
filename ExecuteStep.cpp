@@ -10,9 +10,8 @@ using namespace AlgorithmVisualization;
 /// </summary>
 /// <param name="id"></param>
 /// <param name="type"></param>
-AlgorithmVisualization::SingleStep::SingleStep(int id, int type)
+AlgorithmVisualization::SingleStep::SingleStep(int type)
 {
-	this->Index = id;
 	this->Type = type;
 	ThisState = ref new Vector<IVector<int>^>();
 	ToNextStep = ref new Vector<ExcuteInstruct^>();

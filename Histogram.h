@@ -59,11 +59,6 @@ namespace AlgorithmVisualization {
 
 		property Windows::UI::Xaml::Controls::StackPanel^ container; //用来盛放柱状图的容器
 
-		Pillar^ getOne()
-		{
-			return pillars->GetAt(0);
-		};
-
 	private:
 		int maxNumber = 0;
 		Vector<Pillar^>^ pillars;

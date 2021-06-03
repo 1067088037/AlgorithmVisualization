@@ -45,7 +45,7 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 	else
 	{
 		auto tag = args->InvokedItemContainer->Tag->ToString();
-		Type^ navigateTarget;
+		Type^ navigateTarget = nullptr;
 		if (tag == "Home") {
 			navigateTarget = HomePage::typeid;
 		}
@@ -64,6 +64,7 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 			navigateTarget = SortAlgoPage::typeid;
 			((App^)Application::Current)->sortAlgorithmType = 2;
 		}
-		ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo); //导航到相应页面
+		if (navigateTarget != nullptr)
+			ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo); //导航到相应页面
 	}
 }

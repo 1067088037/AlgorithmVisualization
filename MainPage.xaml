@@ -12,25 +12,67 @@
         <NavigationView x:Name="MainNavView"
                         Loaded="MainNavView_Loaded"
                         ItemInvoked="MainNavView_ItemInvoked"
-                        IsBackButtonVisible="Collapsed">
+                        IsBackButtonVisible="Collapsed"
+                        IsSettingsVisible="False" >
             <NavigationView.MenuItems>
-                <NavigationViewItem Tag="home" Icon="Home" Content="主页" />
+                <NavigationViewItem Tag="Home" Icon="Home" Content="主页" />
                 <NavigationViewItemSeparator />
-                <NavigationViewItem Tag="PrimarySort" Content="初等排序">
+                <NavigationViewItemHeader Content="排序算法" />
+                <NavigationViewItem Tag="PrimarySort" Content="4种初等排序">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8CB;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="AdvancedComparativeSort" Content="高等比较排序">
+                <NavigationViewItem Tag="AdvancedComparativeSort" Content="3种高等比较排序">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8CB;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Tag="AdvancedNonComparativeSort" Content="高等非比较排序">
+                <NavigationViewItem Tag="AdvancedNonComparativeSort" Content="3种高等非比较排序">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8CB;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+
+                <NavigationViewItemHeader Content="查找算法" />
+                <NavigationViewItem Tag="StaticLookup" Content="5种静态查找">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE721;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="DynamicLookup" Content="4种动态查找">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE721;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItemHeader Content="传染病模型" />
+                <NavigationViewItem Tag="SIModel" Content="SI 易感-感染">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="SISModel" Content="SIS 易感-感染-易感">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="SIRModel" Content="SIR 易感-感染-康复">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="SEIRModel" Content="SEIR 易感-潜伏-感染-康复">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Tag="SEIARModel" Content="SEIAR 易感-潜伏-感染-无症状-康复">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
             </NavigationView.MenuItems>
 
             <ScrollViewer>

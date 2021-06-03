@@ -37,6 +37,7 @@ AlgorithmVisualization::Histogram::Histogram()
 {
 	this->container = ref new StackPanel(); //创建堆栈面板
 	this->container->Orientation = Windows::UI::Xaml::Controls::Orientation::Horizontal; //设置堆栈面板为水平方向
+	pillars = ref new Vector<Pillar^>(); //清空柱体向量
 }
 
 /// <summary>
@@ -46,7 +47,7 @@ AlgorithmVisualization::Histogram::Histogram()
 void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers)
 {
 	container->Children->Clear(); //先清空原有的容器
-	pillars = ref new Vector<Pillar^>(); //清空柱体向量
+	pillars->Clear();
 	float64 margin = 4.0; //边界大小
 	int _maxNumber = findMax(numbers); //找到最高的，以它为基准作图
 	maxNumber = _maxNumber;

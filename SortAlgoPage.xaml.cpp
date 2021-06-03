@@ -59,108 +59,100 @@ const vector<NavigateItem> AdvancedNonComparativeSortNavItems = {
 SortAlgoPage::SortAlgoPage()
 {
 	InitializeComponent();
-	histogram = ref new Histogram{}; //初始化容器
-	SortHistogram->Children->Append(histogram->container); //向父级容器中添加柱状图的容器
+	executor = ref new SortExcute(); //实例化排序可执行
+	
+	SortHistogram->Children->Append(executor->histogram->container); //向父级容器中添加柱状图的容器
 	InitNavViewItems(((App^)(Application::Current))->sortAlgorithmType); //初始化导航栏
-
-	sortVector.clear();
-	auto vec = ref new Vector<int>();
-	int size = 16;
-	for (int i = 0; i < size; ++i)
-	{
-		int value = rand() % 99 + 1;
-		sortVector.push_back(value);
-		vec->Append(value);
-	}
-	histogram->load(vec);
 }
-
 
 void AlgorithmVisualization::SortAlgoPage::SortNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	SortNavView->SelectedItem = SortNavView->MenuItems->GetAt(0);
 }
 
-
 void AlgorithmVisualization::SortAlgoPage::SortNavView_ItemInvoked(Microsoft::UI::Xaml::Controls::NavigationView^ sender, Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
 	auto tag = args->InvokedItemContainer->Tag->ToString();
-	if (tag == "BubbleSort") {
-		AlgorithmName->Text = "冒泡排序";
-	}
-	else if (tag == "SelectionSort")
-	{
-		AlgorithmName->Text = "选择排序";
-	}
-	else if (tag == "InsertionSort")
-	{
-		AlgorithmName->Text = "插入排序";
-	}
-	else if (tag == "ShellSort")
-	{
-		AlgorithmName->Text = "希尔排序";
-	}
-	else if (tag == "MergeSort")
-	{
-
-	}
-	else if (tag == "QuickSort")
-	{
-
-	}
-	else if (tag == "HeapSort")
-	{
-
-	}
-	else if (tag == "CountingSort")
-	{
-
-	}
-	else if (tag == "BucketSort")
-	{
-
-	}
-	else if (tag == "RadixSort")
-	{
-
-	}
+	InitAlgorithm(tag);
 }
-
 
 void AlgorithmVisualization::SortAlgoPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	auto workTask = ref new WorkItemHandler([this](IAsyncAction^ workItem)
 		{
-			auto n = sortVector.size();
+			auto n = executor->sortVector->Size;
 			for (auto i = 0; i < n - 1; i++)
 			{
 				auto j = 0;
 				for (j = 0; j < n - i - 1; j++)
 				{
-					histogram->compareOnUI(j, j + 1);
+					executor->histogram->compareOnUI(j, j + 1);
 					Sleep(200);
-					if (sortVector[j] > sortVector[j + 1]) {
-						histogram->swapOnUI(j, j + 1);
-						int temp = sortVector[j + 1];
-						sortVector[j + 1] = sortVector[j];
-						sortVector[j] = temp;
+					if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j+1)) {
+						executor->histogram->swapOnUI(j, j + 1);
+						int temp = executor->sortVector->GetAt(j + 1);
+						executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
+						executor->sortVector->SetAt(j, temp);
 						Sleep(200);
 					}
-					histogram->setStateOnUI(j, PillarState::Default);
+					executor->histogram->setStateOnUI(j, PillarState::Default);
 				}
-				histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed);
+				executor->histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed);
 			}
-			histogram->setStateOnUI(0, PillarState::Completed);
+			executor->histogram->setStateOnUI(0, PillarState::Completed);
 		});
 	auto asyncAction = Windows::System::Threading::ThreadPool::RunAsync(workTask);
 }
 
-
 void AlgorithmVisualization::SortAlgoPage::SortHistogram_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
-	histogram->onSizeChanged(e->NewSize.Width, e->NewSize.Height);
+	executor->histogram->onSizeChanged(e->NewSize.Width, e->NewSize.Height);
 }
 
+void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
+{
+	executor->NavigateToFirst();
+	
+	if (tag == L"BubbleSort") {
+		AlgorithmName->Text = L"冒泡排序";
+	}
+	else if (tag == L"SelectionSort")
+	{
+		AlgorithmName->Text = L"选择排序";
+	}
+	else if (tag == L"InsertionSort")
+	{
+		AlgorithmName->Text = L"插入排序";
+	}
+	else if (tag == L"ShellSort")
+	{
+		AlgorithmName->Text = "希尔排序";
+	}
+	else if (tag == L"MergeSort")
+	{
+
+	}
+	else if (tag == L"QuickSort")
+	{
+
+	}
+	else if (tag == L"HeapSort")
+	{
+
+	}
+	else if (tag == L"CountingSort")
+	{
+
+	}
+	else if (tag == L"BucketSort")
+	{
+
+	}
+	else if (tag == L"RadixSort")
+	{
+
+	}
+}
 
 /// <summary>
 /// 初始化导航栏项目
@@ -173,11 +165,17 @@ void AlgorithmVisualization::SortAlgoPage::InitNavViewItems(int sortAlgorithmTyp
 	switch (sortAlgorithmType) //选择对应的排序算法项目向量
 	{
 	case 0:
-		NavigateItems = PrimarySortNavItems; break;
+		NavigateItems = PrimarySortNavItems;
+		InitAlgorithm(L"BubbleSort");
+		break;
 	case 1:
-		NavigateItems = AdvancedComparativeSortNavItems; break;
+		NavigateItems = AdvancedComparativeSortNavItems;
+		InitAlgorithm(L"MergeSort");
+		break;
 	case 2:
-		NavigateItems = AdvancedNonComparativeSortNavItems; break;
+		NavigateItems = AdvancedNonComparativeSortNavItems;
+		InitAlgorithm(L"CountingSort");
+		break;
 	default:
 		break;
 	}
@@ -188,4 +186,38 @@ void AlgorithmVisualization::SortAlgoPage::InitNavViewItems(int sortAlgorithmTyp
 		menuItem->Tag = i.Tag; //设置标签
 		SortNavView->MenuItems->Append(menuItem); //追加进入菜单栏
 	}
+}
+
+SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
+{
+	sortVector->Clear();
+	auto vec = ref new Vector<int>();
+	int size = 20;
+	for (int i = 0; i < size; ++i)
+	{
+		int value = rand() % 99 + 1;
+		sortVector->Append(value);
+		vec->Append(value);
+	}
+	histogram->load(vec);
+
+	return nullptr;
+}
+
+SingleStep^ AlgorithmVisualization::SortExcute::NavigateToNext()
+{
+	throw ref new Platform::NotImplementedException();
+	// TODO: 在此处插入 return 语句
+}
+
+SingleStep^ AlgorithmVisualization::SortExcute::NavigateToPrevious()
+{
+	throw ref new Platform::NotImplementedException();
+	// TODO: 在此处插入 return 语句
+}
+
+AlgorithmVisualization::SortExcute::SortExcute()
+{
+	histogram = ref new Histogram(); //初始化容器
+	sortVector = ref new Vector<int>();
 }
