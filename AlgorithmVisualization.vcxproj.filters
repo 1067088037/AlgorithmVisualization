@@ -17,6 +17,7 @@
     <ClCompile Include="Histogram.cpp" />
     <ClCompile Include="ExecuteStep.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="CodeDrawable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ExecuteStep.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="CodeDrawable.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">

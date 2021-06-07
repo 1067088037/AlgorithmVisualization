@@ -49,6 +49,7 @@ namespace AlgorithmVisualization
 		void InitAlgorithm(String^ tag);
 		void InitNavViewItems(int sortAlgorithmType);
 		void Debug(String^ message);
+		void StartThreadTimer();
 
 		SortExcute^ executor;
 		bool LooperIsRunning = false;

@@ -43,9 +43,15 @@ namespace AlgorithmVisualization {
 		bool IsLastStep(); //是否是最后一步
 		SingleStep^ GetFirstStep(); //获取第一步
 		SingleStep^ GetLastStep(); //获取最后一步
+		void DefaultInit(); //默认初始化函数
+		bool TimerIsRunning(); //计时器是否在运行
+		void StopTimer(); //终止计时器
 
+		property IVector<int>^ SpeedList;
 		property IVector<SingleStep^>^ StepList; //步骤列表
 		property int CurrentStep; //当前的步骤
+		property int Speed; //演示速度
+		property Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 
 	protected private:
 		virtual SingleStep^ NavigateToStep(int index) = 0; //导航到指定的步骤

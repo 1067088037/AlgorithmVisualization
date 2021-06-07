@@ -9,6 +9,7 @@
 #include <vector>
 #include "ExecuteStep.h"
 #include "Util.h"
+#include "CodeDrawable.h"
 
 using namespace AlgorithmVisualization;
 
@@ -29,6 +30,7 @@ using namespace Windows::UI;
 using namespace Windows::ApplicationModel::Core;
 using namespace Windows::System::Threading;
 using namespace Windows::UI::Core;
+using namespace Windows::UI::Xaml::Documents;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
 
@@ -94,30 +96,20 @@ void AlgorithmVisualization::SortAlgoPage::SortNavView_ItemInvoked(Microsoft::UI
 /// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::Debug_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	//auto workTask = ref new WorkItemHandler([this](IAsyncAction^ workItem)
-	//	{
-	//		auto n = executor->sortVector->Size;
-	//		for (auto i = 0; i < n - 1; i++)
-	//		{
-	//			auto j = 0;
-	//			for (j = 0; j < n - i - 1; j++)
-	//			{
-	//				executor->histogram->compareOnUI(j, j + 1);
-	//				Sleep(200);
-	//				if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j + 1)) {
-	//					executor->histogram->swapOnUI(j, j + 1);
-	//					int temp = executor->sortVector->GetAt(j + 1);
-	//					executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
-	//					executor->sortVector->SetAt(j, temp);
-	//					Sleep(200);
-	//				}
-	//				executor->histogram->setStateOnUI(j, PillarState::Default);
-	//			}
-	//			executor->histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed);
-	//		}
-	//		executor->histogram->setStateOnUI(0, PillarState::Completed);
-	//	});
-	//auto asyncAction = Windows::System::Threading::ThreadPool::RunAsync(workTask);
+	//auto para = ref new Paragraph();
+	//auto run = ref new Run();
+	//run->Text = "1222222";
+	//run->Foreground = ref new SolidColorBrush(Colors::CadetBlue);
+	//para->Inlines->Append(run);
+	//Code->Blocks->Append(para);
+
+	auto code = ref new CodeDrawable();
+	code->Texts->Append("111111111111\n");
+	code->Texts->Append("222222222222\n");
+	code->Texts->Append("3333333333\n");
+	code->Texts->Append("444444444\n");
+	Code->Blocks->Clear();
+	Code->Blocks->Append(code->GenerateDrawable(2));
 }
 
 /// <summary>
@@ -142,9 +134,12 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	executor->SpeedText = SpeedText;
 	executor->SpeedSlider = SpeedSlider;
 
+	SpeedSlider->Maximum = executor->SpeedList->Size - 1;
+	SpeedSlider->Minimum = 1;
+
 	if (tag == L"BubbleSort") {
 		AlgorithmName->Text = L"冒泡排序";
-		
+		SpeedSlider->Value = 13;
 		auto n = executor->sortVector->Size; //数字总数
 		Debug("数字总数 = " + n);
 		auto stateList = ref new Vector<int>(n, (int)PillarState::Default);
@@ -258,6 +253,35 @@ void AlgorithmVisualization::SortAlgoPage::Debug(String^ message)
 	Console->Text += message + "\n";
 }
 
+void AlgorithmVisualization::SortAlgoPage::StartThreadTimer()
+{
+	if (!executor->TimerIsRunning())
+	{
+		Windows::Foundation::TimeSpan period{};
+		period.Duration = executor->Speed * 10000;
+		executor->ThreadTimer = ThreadPoolTimer::CreatePeriodicTimer(
+			ref new TimerElapsedHandler([this](ThreadPoolTimer^ source)
+				{
+					if (executor->IsLastStep())
+					{
+						executor->StopTimer();
+						return;
+					}
+					CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High, ref new DispatchedHandler([this]()
+						{
+							if (executor->IsLastStep())
+							{
+								executor->StopTimer();
+								return;
+							}
+							executor->NavigateToNext();
+						}
+					));
+				}), period
+		);
+	}
+}
+
 SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 {
 	CurrentStep = index;
@@ -296,11 +320,10 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToPrevious()
 /// </summary>
 AlgorithmVisualization::SortExcute::SortExcute()
 {
-	StepList = ref new Vector<SingleStep^>();
-	CurrentStep = 0;
+	DefaultInit();
 	histogram = ref new Histogram(); //初始化容器
 	sortVector = ref new Vector<int>(); //初始化要排序的向量
-	int size = 20;
+	int size = 25;
 	for (int i = 0; i < size; ++i)
 	{
 		int value = rand() % 99 + 1;
@@ -326,7 +349,7 @@ void AlgorithmVisualization::SortAlgoPage::Previous_Click(Platform::Object^ send
 /// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-
+	StartThreadTimer();
 }
 
 /// <summary>
@@ -336,7 +359,7 @@ void AlgorithmVisualization::SortAlgoPage::Start_Click(Platform::Object^ sender,
 /// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::Pause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-
+	executor->StopTimer();
 }
 
 /// <summary>
@@ -403,5 +426,11 @@ void AlgorithmVisualization::SortAlgoPage::ProgressSlider_ValueChanged(Platform:
 
 void AlgorithmVisualization::SortAlgoPage::SpeedSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
 {
-
+	executor->Speed = executor->SpeedList->GetAt(e->NewValue);
+	SpeedText->Text = executor->Speed / 1000.0 + "秒/步";
+	if (executor->TimerIsRunning())
+	{
+		executor->StopTimer();
+		StartThreadTimer();
+	}
 }

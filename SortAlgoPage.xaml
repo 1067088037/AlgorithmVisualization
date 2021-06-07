@@ -58,7 +58,7 @@
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Margin="6" FontSize="18">展示速度</TextBlock>
-                                    <TextBlock x:Name="SpeedText" FontSize="16" VerticalAlignment="Center" Margin="6">0.1s/步</TextBlock>
+                                    <TextBlock x:Name="SpeedText" FontSize="16" VerticalAlignment="Center" Margin="6">0.1秒/步</TextBlock>
                                 </StackPanel>
                                 <Slider x:Name="SpeedSlider" Margin="6" ValueChanged="SpeedSlider_ValueChanged"></Slider>
                             </StackPanel>

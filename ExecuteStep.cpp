@@ -4,6 +4,9 @@
 using namespace Platform;
 using namespace Platform::Collections;
 using namespace AlgorithmVisualization;
+using namespace Windows::System::Threading;
+using namespace Windows::ApplicationModel::Core;
+using namespace Windows::UI::Core;
 
 /// <summary>
 /// 构造函数
@@ -111,4 +114,29 @@ SingleStep^ AlgorithmVisualization::ExecuteStep::GetLastStep()
 {
 	if (StepList->Size == 0) return nullptr;
 	else return StepList->GetAt(StepList->Size - 1);
+}
+
+void AlgorithmVisualization::ExecuteStep::DefaultInit()
+{
+	SpeedList = ref new Vector<int>{ 0, 20, 40, 60, 80,
+		100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950,
+		1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000 };
+	StepList = ref new Vector<SingleStep^>();
+	CurrentStep = 0;
+	Speed = 200;
+	ThreadTimer = nullptr;
+}
+
+bool AlgorithmVisualization::ExecuteStep::TimerIsRunning()
+{
+	return ThreadTimer != nullptr;
+}
+
+void AlgorithmVisualization::ExecuteStep::StopTimer()
+{
+	if (ThreadTimer != nullptr)
+	{
+		ThreadTimer->Cancel();
+		ThreadTimer = nullptr;
+	}
 }
