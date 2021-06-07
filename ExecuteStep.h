@@ -39,8 +39,13 @@ namespace AlgorithmVisualization {
 		void ClearStep(); //清空步骤
 		SingleStep^ NavigateToFirst(); //导航到第一步
 		SingleStep^ NavigateToLast(); //导航到最后一步
+		bool IsFirstStep(); //是否是第一步
+		bool IsLastStep(); //是否是最后一步
+		SingleStep^ GetFirstStep(); //获取第一步
+		SingleStep^ GetLastStep(); //获取最后一步
 
 		property IVector<SingleStep^>^ StepList; //步骤列表
+		property int CurrentStep; //当前的步骤
 
 	protected private:
 		virtual SingleStep^ NavigateToStep(int index) = 0; //导航到指定的步骤

@@ -73,3 +73,42 @@ SingleStep^ AlgorithmVisualization::ExecuteStep::NavigateToLast()
 {
 	return NavigateToStep(CountStep() - 1);
 }
+
+/// <summary>
+/// 是否是第一步
+/// </summary>
+/// <returns></returns>
+bool AlgorithmVisualization::ExecuteStep::IsFirstStep()
+{
+	return CurrentStep == 0;
+}
+
+/// <summary>
+/// 是否是最后一步
+/// </summary>
+/// <returns></returns>
+bool AlgorithmVisualization::ExecuteStep::IsLastStep()
+{
+	if (StepList->Size != 0) return CurrentStep == StepList->Size - 1;
+	else return true;
+}
+
+/// <summary>
+/// 获取第一步
+/// </summary>
+/// <returns></returns>
+SingleStep^ AlgorithmVisualization::ExecuteStep::GetFirstStep()
+{
+	if (StepList->Size == 0) return nullptr;
+	else return StepList->GetAt(0);
+}
+
+/// <summary>
+/// 获取最后一步
+/// </summary>
+/// <returns></returns>
+SingleStep^ AlgorithmVisualization::ExecuteStep::GetLastStep()
+{
+	if (StepList->Size == 0) return nullptr;
+	else return StepList->GetAt(StepList->Size - 1);
+}

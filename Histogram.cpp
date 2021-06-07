@@ -46,17 +46,23 @@ AlgorithmVisualization::Histogram::Histogram()
 /// <param name="numbers">要展示的数字向量</param> 
 void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers)
 {
+	load(numbers, ref new Vector<PillarState>(numbers->Size, PillarState::Default));
+}
+
+void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<PillarState>^ states)
+{
 	container->Children->Clear(); //先清空原有的容器
 	pillars->Clear();
 	float64 margin = 4.0; //边界大小
 	int _maxNumber = findMax(numbers); //找到最高的，以它为基准作图
 	maxNumber = _maxNumber;
 	int pillarWidth = (int)(width / numbers->Size); //计算宽度
-	for (int number : numbers)
+	for (int i = 0; i < numbers->Size; ++i)
 	{
+		int number = numbers->GetAt(i);
 		auto rect = ref new Rectangle(); //创建矩形
 		int pillarHeight = (int)(height * number / maxNumber); //计算高度
-		auto pillar = ref new Pillar{ number, pillarWidth, pillarHeight,DefaultColor }; //实例化柱体，设置合理的高度和宽度
+		auto pillar = ref new Pillar{ number, pillarWidth, pillarHeight, stateToColor(states->GetAt(i)) }; //实例化柱体，设置合理的高度和宽度
 		container->Children->Append(pillar->getView()); //追加进容器
 		pillars->Append(pillar); //追加到向量末尾
 	}
@@ -129,24 +135,7 @@ void AlgorithmVisualization::Histogram::setColor(int index, Windows::UI::Color c
 /// <param name="state">状态</param>
 void AlgorithmVisualization::Histogram::setState(int index, PillarState state)
 {
-	Color color;
-	switch (state)
-	{
-	case PillarState::Default:
-		color = DefaultColor;
-		break;
-	case PillarState::Compared:
-		color = ComparedColor;
-		break;
-	case PillarState::Swapping:
-		color = SwappingColor;
-		break;
-	case PillarState::Completed:
-		color = CompletedColor;
-		break;
-	default:
-		break;
-	}
+	Color color = stateToColor(state);
 	setColor(index, color);
 }
 
@@ -192,6 +181,29 @@ void AlgorithmVisualization::Histogram::onSizeChanged(float _width, float _heigh
 		int pillarHeight = (int)(height * i->number / maxNumber); //计算高度
 		i->resize(pillarWidth, pillarHeight);
 	}
+}
+
+Color AlgorithmVisualization::Histogram::stateToColor(PillarState state)
+{
+	Color color;
+	switch (state)
+	{
+	case PillarState::Default:
+		color = DefaultColor;
+		break;
+	case PillarState::Compared:
+		color = ComparedColor;
+		break;
+	case PillarState::Swapping:
+		color = SwappingColor;
+		break;
+	case PillarState::Completed:
+		color = CompletedColor;
+		break;
+	default:
+		break;
+	}
+	return color;
 }
 
 /// <summary>

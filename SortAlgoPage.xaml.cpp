@@ -8,6 +8,7 @@
 #include "Histogram.h"
 #include <vector>
 #include "ExecuteStep.h"
+#include "Util.h"
 
 using namespace AlgorithmVisualization;
 
@@ -56,65 +57,126 @@ const vector<NavigateItem> AdvancedNonComparativeSortNavItems = {
 	NavigateItem{L"RadixSort", L"基数排序"}
 }; //高等非比较排序导航项目
 
+/// <summary>
+/// 排序算法页面构造函数
+/// </summary>
 SortAlgoPage::SortAlgoPage()
 {
 	InitializeComponent();
-	executor = ref new SortExcute(); //实例化排序可执行
-	
-	SortHistogram->Children->Append(executor->histogram->container); //向父级容器中添加柱状图的容器
 	InitNavViewItems(((App^)(Application::Current))->sortAlgorithmType); //初始化导航栏
 }
 
+/// <summary>
+/// 导航栏的加载
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::SortNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	SortNavView->SelectedItem = SortNavView->MenuItems->GetAt(0);
 }
 
+/// <summary>
+/// 当项目被点击时
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="args"></param>
 void AlgorithmVisualization::SortAlgoPage::SortNavView_ItemInvoked(Microsoft::UI::Xaml::Controls::NavigationView^ sender, Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
 	auto tag = args->InvokedItemContainer->Tag->ToString();
 	InitAlgorithm(tag);
 }
 
-void AlgorithmVisualization::SortAlgoPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+/// <summary>
+/// 调试按钮被点击时
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::SortAlgoPage::Debug_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	auto workTask = ref new WorkItemHandler([this](IAsyncAction^ workItem)
-		{
-			auto n = executor->sortVector->Size;
-			for (auto i = 0; i < n - 1; i++)
-			{
-				auto j = 0;
-				for (j = 0; j < n - i - 1; j++)
-				{
-					executor->histogram->compareOnUI(j, j + 1);
-					Sleep(200);
-					if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j+1)) {
-						executor->histogram->swapOnUI(j, j + 1);
-						int temp = executor->sortVector->GetAt(j + 1);
-						executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
-						executor->sortVector->SetAt(j, temp);
-						Sleep(200);
-					}
-					executor->histogram->setStateOnUI(j, PillarState::Default);
-				}
-				executor->histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed);
-			}
-			executor->histogram->setStateOnUI(0, PillarState::Completed);
-		});
-	auto asyncAction = Windows::System::Threading::ThreadPool::RunAsync(workTask);
+	//auto workTask = ref new WorkItemHandler([this](IAsyncAction^ workItem)
+	//	{
+	//		auto n = executor->sortVector->Size;
+	//		for (auto i = 0; i < n - 1; i++)
+	//		{
+	//			auto j = 0;
+	//			for (j = 0; j < n - i - 1; j++)
+	//			{
+	//				executor->histogram->compareOnUI(j, j + 1);
+	//				Sleep(200);
+	//				if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j + 1)) {
+	//					executor->histogram->swapOnUI(j, j + 1);
+	//					int temp = executor->sortVector->GetAt(j + 1);
+	//					executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
+	//					executor->sortVector->SetAt(j, temp);
+	//					Sleep(200);
+	//				}
+	//				executor->histogram->setStateOnUI(j, PillarState::Default);
+	//			}
+	//			executor->histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed);
+	//		}
+	//		executor->histogram->setStateOnUI(0, PillarState::Completed);
+	//	});
+	//auto asyncAction = Windows::System::Threading::ThreadPool::RunAsync(workTask);
 }
 
+/// <summary>
+/// 排序柱状图监测尺寸改变
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::SortHistogram_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
 	executor->histogram->onSizeChanged(e->NewSize.Width, e->NewSize.Height);
 }
 
+/// <summary>
+/// 初始化算法
+/// </summary>
+/// <param name="tag"></param>
 void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 {
-	executor->NavigateToFirst();
-	
+	executor = ref new SortExcute(); //实例化排序可执行
+	executor->ProcessText = ProcessText;
+	executor->ProgressSlider = ProgressSlider;
+	executor->SpeedText = SpeedText;
+	executor->SpeedSlider = SpeedSlider;
+
 	if (tag == L"BubbleSort") {
 		AlgorithmName->Text = L"冒泡排序";
+		
+		auto n = executor->sortVector->Size; //数字总数
+		Debug("数字总数 = " + n);
+		auto stateList = ref new Vector<int>(n, (int)PillarState::Default);
+		AddRecoverStep(stateList, ref new Vector<int>());
+		for (auto i = 0; i < n - 1; i++)
+		{
+			for (auto j = 0; j < n - i - 1; j++)
+			{
+				//Debug("添加比较");
+				AddCompareStep(stateList, j, j + 1);
+				//executor->histogram->compareOnUI(j, j + 1); //比较j和j+1大小
+				if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j + 1)) { //如果后者更大
+					//Debug("添加交换");
+					//executor->histogram->swapOnUI(j, j + 1); //交换二者
+					int temp = executor->sortVector->GetAt(j + 1);
+					executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
+					executor->sortVector->SetAt(j, temp);
+
+					AddSwapStep(stateList, j, j + 1);
+				}
+				stateList->SetAt(j, (int)PillarState::Default);
+				//executor->histogram->setStateOnUI(j, PillarState::Default); //让前者恢复默认状态
+			}
+			AddCompleteStep(stateList, ref new Vector<int>{ (int)n - i - 1 });
+			//executor->histogram->setStateOnUI((int)(n - i - 1), PillarState::Completed); //最后一个设置为已完成状态
+		}
+		AddCompleteStep(stateList, ref new Vector<int>{ 0 });
+		//executor->histogram->setStateOnUI(0, PillarState::Completed); //第一个也设为已完成
+		Debug("总步骤数 = " + executor->CountStep());
+
+		ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString();
+		ProgressSlider->Maximum = executor->StepList->Size - 1;
 	}
 	else if (tag == L"SelectionSort")
 	{
@@ -152,6 +214,9 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	{
 
 	}
+
+	SortHistogram->Children->Append(executor->histogram->container); //向父级容器中添加柱状图的容器
+	executor->NavigateToFirst();
 }
 
 /// <summary>
@@ -181,43 +246,162 @@ void AlgorithmVisualization::SortAlgoPage::InitNavViewItems(int sortAlgorithmTyp
 	}
 	for (NavigateItem i : NavigateItems)
 	{
-		auto menuItem = ref new Microsoft::UI::Xaml::Controls::NavigationViewItem();
+		auto menuItem = ref new Microsoft::UI::Xaml::Controls::NavigationViewItem(); //创建菜单栏目
 		menuItem->Content = i.Content; //设置内容
 		menuItem->Tag = i.Tag; //设置标签
 		SortNavView->MenuItems->Append(menuItem); //追加进入菜单栏
 	}
 }
 
+void AlgorithmVisualization::SortAlgoPage::Debug(String^ message)
+{
+	Console->Text += message + "\n";
+}
+
 SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 {
-	sortVector->Clear();
-	auto vec = ref new Vector<int>();
+	CurrentStep = index;
+	ProcessText->Text = CurrentStep.ToString() + "/" + (StepList->Size - 1).ToString();
+	ProgressSlider->Value = CurrentStep;
+	if (index >= 0 && index < StepList->Size)
+	{
+		auto stateList = ref new Vector<PillarState>();
+		for (int i : StepList->GetAt(index)->ThisState->GetAt(1))
+		{
+			stateList->Append((PillarState)i);
+		}
+		histogram->load(StepList->GetAt(index)->ThisState->GetAt(0), stateList);
+		return StepList->GetAt(index);
+	}
+	else
+	{
+		throw ref new InvalidArgumentException("传入的序号越界");
+	}
+}
+
+SingleStep^ AlgorithmVisualization::SortExcute::NavigateToNext()
+{
+	CurrentStep++;
+	return NavigateToStep(CurrentStep);
+}
+
+SingleStep^ AlgorithmVisualization::SortExcute::NavigateToPrevious()
+{
+	CurrentStep--;
+	return NavigateToStep(CurrentStep);
+}
+
+/// <summary>
+/// 算法可执行类的构造函数
+/// </summary>
+AlgorithmVisualization::SortExcute::SortExcute()
+{
+	StepList = ref new Vector<SingleStep^>();
+	CurrentStep = 0;
+	histogram = ref new Histogram(); //初始化容器
+	sortVector = ref new Vector<int>(); //初始化要排序的向量
 	int size = 20;
 	for (int i = 0; i < size; ++i)
 	{
 		int value = rand() % 99 + 1;
 		sortVector->Append(value);
-		vec->Append(value);
 	}
-	histogram->load(vec);
-
-	return nullptr;
 }
 
-SingleStep^ AlgorithmVisualization::SortExcute::NavigateToNext()
+/// <summary>
+/// 上一步
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::SortAlgoPage::Previous_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	throw ref new Platform::NotImplementedException();
-	// TODO: 在此处插入 return 语句
+	if (!executor->IsFirstStep()) executor->NavigateToPrevious();
+	//Debug("当前步骤:" + executor->CurrentStep);
 }
 
-SingleStep^ AlgorithmVisualization::SortExcute::NavigateToPrevious()
+/// <summary>
+/// 开始按钮
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::SortAlgoPage::Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	throw ref new Platform::NotImplementedException();
-	// TODO: 在此处插入 return 语句
+
 }
 
-AlgorithmVisualization::SortExcute::SortExcute()
+/// <summary>
+/// 暂停按钮
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::SortAlgoPage::Pause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	histogram = ref new Histogram(); //初始化容器
-	sortVector = ref new Vector<int>();
+
+}
+
+/// <summary>
+/// 下一步
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::SortAlgoPage::Next_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	if (!executor->IsLastStep()) executor->NavigateToNext();
+	//Debug("当前步骤:" + executor->CurrentStep);
+}
+
+void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateList, int left, int right)
+{
+	auto compareStep = ref new SingleStep(0); //比较步骤
+	compareStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	stateList->SetAt(left, (int)PillarState::Compared);
+	stateList->SetAt(right, (int)PillarState::Compared);
+	compareStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(compareStep);
+}
+
+void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, int left, int right)
+{
+	auto swapStep = ref new SingleStep(1);
+	swapStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	stateList->SetAt(left, (int)PillarState::Swapping);
+	stateList->SetAt(right, (int)PillarState::Swapping);
+	swapStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(swapStep);
+}
+
+void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover)
+{
+	auto recoverStep = ref new SingleStep(2);
+	recoverStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	for (auto i : recover)
+	{
+		stateList->SetAt(i, (int)PillarState::Swapping);
+	}
+	recoverStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(recoverStep);
+}
+
+void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete)
+{
+	auto endStep = ref new SingleStep(3);
+	endStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	for (auto i : complete)
+	{
+		stateList->SetAt(i, (int)PillarState::Completed);
+	}
+	endStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(endStep);
+}
+
+
+void AlgorithmVisualization::SortAlgoPage::ProgressSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	executor->NavigateToStep(e->NewValue);
+}
+
+
+void AlgorithmVisualization::SortAlgoPage::SpeedSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+
 }

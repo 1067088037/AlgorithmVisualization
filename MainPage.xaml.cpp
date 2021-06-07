@@ -31,8 +31,13 @@ MainPage::MainPage()
 // 主页导航加载完成时回调
 void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(0);
-	ContentFrame->Navigate((Type^)HomePage::typeid);
+	//MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(0);
+	//ContentFrame->Navigate((Type^)HomePage::typeid);
+
+	//TODO:方便调试
+	MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(1);
+	ContentFrame->Navigate((Type^)SortAlgoPage::typeid);
+	((App^)Application::Current)->sortAlgorithmType = 0;
 }
 
 // 主页导航的Item被点击时回调

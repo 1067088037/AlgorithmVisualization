@@ -48,6 +48,7 @@ namespace AlgorithmVisualization {
 	public:
 		Histogram();
 		void load(IVector<int>^ numbers); //绘制柱状图
+		void load(IVector<int>^ numbers, IVector<PillarState>^ states); //绘制柱状图
 		void swap(int left, int right); //交换两个柱体的位置
 		void swapOnUI(int left, int right); //在UI线程交换两个柱体的位置并设置状态
 		void compareOnUI(int left, int right); //在UI线程展示比较两个柱体
@@ -56,6 +57,7 @@ namespace AlgorithmVisualization {
 		void setStateOnUI(int index, PillarState state); //在UI线程设置单个柱体的状态
 		void setStatesOnUI(IVector<int>^ indexs, IVector<PillarState>^ states); //批量设置柱体状态
 		void onSizeChanged(float _width, float _height); //当界面尺寸改变时
+		Color stateToColor(PillarState state); //状态转颜色
 
 		property Windows::UI::Xaml::Controls::StackPanel^ container; //用来盛放柱状图的容器
 

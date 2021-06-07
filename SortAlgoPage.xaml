@@ -28,7 +28,7 @@
 
                     <StackPanel x:Name="SortHistogramStack" Grid.Row="0" Grid.Column="0" Margin="6">
                         <TextBlock FontSize="24" Margin="6">柱状图</TextBlock>
-                        <Button Content="调试" Click="Button_Click"></Button>
+                        <Button Content="调试" Click="Debug_Click"></Button>
                         <Grid x:Name="SortHistogram" Margin="6" SizeChanged="SortHistogram_SizeChanged">
 
                         </Grid>
@@ -40,10 +40,10 @@
                         <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>
                         <TextBlock x:Name="Introduction" Margin="6">算法介绍</TextBlock>
                         <StackPanel Margin="6" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button x:Name="Previous">上一步</Button>
-                            <Button x:Name="Start" Margin="20 0 0 0">开始</Button>
-                            <Button x:Name="Pause" Margin="20 0 0 0">暂停</Button>
-                            <Button x:Name="Next" Margin="20 0 0 0">下一步</Button>
+                            <Button x:Name="Previous" Click="Previous_Click">上一步</Button>
+                            <Button x:Name="Start" Margin="20 0 0 0" Click="Start_Click">开始</Button>
+                            <Button x:Name="Pause" Margin="20 0 0 0" Click="Pause_Click">暂停</Button>
+                            <Button x:Name="Next" Margin="20 0 0 0" Click="Next_Click">下一步</Button>
                         </StackPanel>
                         <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
                             <StackPanel Orientation="Vertical">
@@ -51,7 +51,7 @@
                                     <TextBlock Margin="6" FontSize="18">执行进度</TextBlock>
                                     <TextBlock x:Name="ProcessText" FontSize="16" VerticalAlignment="Center" Margin="6">100/100</TextBlock>
                                 </StackPanel>
-                                <Slider x:Name="ProgressSlider" Margin="6"></Slider>
+                                <Slider x:Name="ProgressSlider" Margin="6" ValueChanged="ProgressSlider_ValueChanged"></Slider>
                             </StackPanel>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
@@ -60,7 +60,7 @@
                                     <TextBlock Margin="6" FontSize="18">展示速度</TextBlock>
                                     <TextBlock x:Name="SpeedText" FontSize="16" VerticalAlignment="Center" Margin="6">0.1s/步</TextBlock>
                                 </StackPanel>
-                                <Slider x:Name="SpeedProgress" Margin="6"></Slider>
+                                <Slider x:Name="SpeedSlider" Margin="6" ValueChanged="SpeedSlider_ValueChanged"></Slider>
                             </StackPanel>
                         </Border>
                         <RichTextBlock x:Name="Code" Margin="6">
