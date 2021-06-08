@@ -250,7 +250,9 @@ Windows::UI::Xaml::Controls::StackPanel^ AlgorithmVisualization::Pillar::getView
 
 void AlgorithmVisualization::Pillar::resize(int _width, int _height)
 {
-	rect->Width = _width - margin * 2; //设置宽度
-	rect->Height = _height; //设置高度
-	textBlock->Width = _width - margin * 2; //设置宽度
+	int newWidth = max(_width - margin * 2, 2);
+	int newHeight= max(_height, 2);
+	rect->Width = newWidth; //设置宽度
+	rect->Height = newHeight; //设置高度
+	textBlock->Width = newWidth; //设置宽度
 }
