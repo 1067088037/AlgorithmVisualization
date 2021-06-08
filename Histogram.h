@@ -63,14 +63,14 @@ namespace AlgorithmVisualization {
 
 	private:
 		int maxNumber = 0;
-		Vector<Pillar^>^ pillars;
+		Vector<Pillar^>^ pillars; //柱体向量
 
 		float width = 980.0;
 		float height = 380.0;
 		
-		Color DefaultColor = Colors::Blue;
-		Color SwappingColor = Colors::Red;
-		Color ComparedColor = Colors::Green;
-		Color CompletedColor = Colors::Yellow;
+		Color DefaultColor = Colors::Blue; //默认颜色
+		Color SwappingColor = Colors::Red; //正在交换颜色
+		Color ComparedColor = Colors::Green; //比较颜色
+		Color CompletedColor = Colors::Yellow; //完成颜色
 	};
 }

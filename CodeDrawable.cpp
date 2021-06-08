@@ -15,11 +15,21 @@ AlgorithmVisualization::CodeDrawable::CodeDrawable()
 	Texts = ref new Vector<String^>();
 }
 
+/// <summary>
+/// 生成可绘制的代码
+/// </summary>
+/// <param name="highLightLine">高亮行数</param>
+/// <returns>[0]是段落，[1]是高亮</returns>
 IVector<Object^>^ AlgorithmVisualization::CodeDrawable::GenerateDrawable(int highLightLine)
 {
 	return GenerateDrawable(ref new Vector<int>{ highLightLine });
 }
 
+/// <summary>
+/// 生成可绘制的代码
+/// </summary>
+/// <param name="highLightLine">多个高亮行</param>
+/// <returns>[0]是段落，[1]是高亮</returns>
 IVector<Object^>^ AlgorithmVisualization::CodeDrawable::GenerateDrawable(IVector<int>^ highLightLine)
 {
 	auto result = ref new Vector<Object^>();

@@ -19,9 +19,9 @@ namespace AlgorithmVisualization {
 		IVector<Object^>^ GenerateDrawable(int highLightLine); //生成可绘制的代码
 		IVector<Object^>^ GenerateDrawable(IVector<int>^ highLightLines); //生成可绘制的代码
 
-		property IVector<String^>^ Texts;
+		property IVector<String^>^ Texts; //代码文本
 	
 	private:
-		Color HighlighterColor = Colors::LightGoldenrodYellow;
+		Color HighlighterColor = Colors::LightSkyBlue; //高亮颜色
 	};
 }

@@ -117,6 +117,9 @@ SingleStep^ AlgorithmVisualization::ExecuteStep::GetLastStep()
 	else return StepList->GetAt(StepList->Size - 1);
 }
 
+/// <summary>
+/// 默认初始化
+/// </summary>
 void AlgorithmVisualization::ExecuteStep::DefaultInit()
 {
 	SpeedList = ref new Vector<int>{ 0, 20, 40, 60, 80,
@@ -124,19 +127,27 @@ void AlgorithmVisualization::ExecuteStep::DefaultInit()
 		1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000 };
 	StepList = ref new Vector<SingleStep^>();
 	CurrentStep = 0;
-	Speed = 200;
+	Speed = 500; //默认速度
 	ThreadTimer = nullptr;
 }
 
+/// <summary>
+/// 获取计时器是否在运行
+/// </summary>
+/// <returns></returns>
 bool AlgorithmVisualization::ExecuteStep::TimerIsRunning()
 {
 	return ThreadTimer != nullptr;
 }
 
+/// <summary>
+/// 终止计时器
+/// </summary>
 void AlgorithmVisualization::ExecuteStep::StopTimer()
 {
 	if (ThreadTimer != nullptr)
 	{
+		//不为空就取消并设为空
 		ThreadTimer->Cancel();
 		ThreadTimer = nullptr;
 	}
