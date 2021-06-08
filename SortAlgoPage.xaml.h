@@ -9,6 +9,7 @@
 #include "Histogram.h"
 #include <vector>
 #include "ExecuteStep.h"
+#include "CodeDrawable.h"
 
 using namespace std;
 using namespace Windows::UI::Xaml::Controls;
@@ -24,6 +25,7 @@ namespace AlgorithmVisualization
 		virtual SingleStep^ NavigateToPrevious() override;
 
 		SortExcute();
+		void ShowCodeChange(IVector<int>^ highlighters);
 
 		property Histogram^ histogram; //柱状图
 		property IVector<int>^ sortVector; //要排序的向量
@@ -31,6 +33,8 @@ namespace AlgorithmVisualization
 		property Slider^ ProgressSlider; //过程滑块
 		property TextBlock^ SpeedText; //速度文本
 		property Slider^ SpeedSlider; //速度滑块
+		property RichTextBlock^ CodeText; //代码文本
+		property CodeDrawable^ CodeDrawable; //可绘制的代码
 	};
 
 	/// <summary>
@@ -59,8 +63,8 @@ namespace AlgorithmVisualization
 		void Pause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void Next_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
-		void AddCompareStep(IVector<int>^ stateList, int left, int right); //新建比较步骤
-		void AddSwapStep(IVector<int>^ stateList, int left, int right); //新建交换步骤
+		void AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine); //新建比较步骤
+		void AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine); //新建交换步骤
 		void AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover); //新建恢复成默认状态的步骤
 		void AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete); //新建完成的步骤
 		void ProgressSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);

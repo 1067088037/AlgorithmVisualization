@@ -16,6 +16,7 @@ using namespace Windows::UI::Core;
 AlgorithmVisualization::SingleStep::SingleStep(int type)
 {
 	this->Type = type;
+	HighlightLines = ref new Vector<int>();
 	ThisState = ref new Vector<IVector<int>^>();
 	ToNextStep = ref new Vector<ExcuteInstruct^>();
 }

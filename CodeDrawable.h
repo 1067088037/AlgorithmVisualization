@@ -16,12 +16,12 @@ namespace AlgorithmVisualization {
 	{
 	public:
 		CodeDrawable();
-		Paragraph^ GenerateDrawable(int highLightLine); //生成可绘制的代码
-		Paragraph^ GenerateDrawable(IVector<int>^ highLightLines); //生成可绘制的代码
+		IVector<Object^>^ GenerateDrawable(int highLightLine); //生成可绘制的代码
+		IVector<Object^>^ GenerateDrawable(IVector<int>^ highLightLines); //生成可绘制的代码
 
 		property IVector<String^>^ Texts;
 	
 	private:
-		String^ Content;
+		Color HighlighterColor = Colors::LightGoldenrodYellow;
 	};
 }

@@ -96,20 +96,7 @@ void AlgorithmVisualization::SortAlgoPage::SortNavView_ItemInvoked(Microsoft::UI
 /// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::Debug_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	//auto para = ref new Paragraph();
-	//auto run = ref new Run();
-	//run->Text = "1222222";
-	//run->Foreground = ref new SolidColorBrush(Colors::CadetBlue);
-	//para->Inlines->Append(run);
-	//Code->Blocks->Append(para);
-
-	auto code = ref new CodeDrawable();
-	code->Texts->Append("111111111111\n");
-	code->Texts->Append("222222222222\n");
-	code->Texts->Append("3333333333\n");
-	code->Texts->Append("444444444\n");
-	Code->Blocks->Clear();
-	Code->Blocks->Append(code->GenerateDrawable(2));
+	
 }
 
 /// <summary>
@@ -133,23 +120,39 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	executor->ProgressSlider = ProgressSlider;
 	executor->SpeedText = SpeedText;
 	executor->SpeedSlider = SpeedSlider;
+	executor->CodeText = Code;
+	executor->CodeDrawable = ref new CodeDrawable();
+	auto codeDrawable = executor->CodeDrawable;
 
 	SpeedSlider->Maximum = executor->SpeedList->Size - 1;
 	SpeedSlider->Minimum = 1;
 
+
 	if (tag == L"BubbleSort") {
 		AlgorithmName->Text = L"冒泡排序";
+
+		codeDrawable->Texts->Clear();
+		codeDrawable->Texts->Append("for (int i = 0; i < n - 1; i++)\n" +
+			"{\n" +
+			"\    for (int j = 0; j < n - i - 1; j++)\n" +
+			"\    {\n");
+		codeDrawable->Texts->Append("        if (arr[j] > arr[j + 1])    \n");
+		codeDrawable->Texts->Append("            std::swap(arr[j], arr[j + 1]);    \n");
+		codeDrawable->Texts->Append("    }\n" +
+			"}");
+		
 		SpeedSlider->Value = 13;
 		auto n = executor->sortVector->Size; //数字总数
 		Debug("数字总数 = " + n);
 		auto stateList = ref new Vector<int>(n, (int)PillarState::Default);
 		AddRecoverStep(stateList, ref new Vector<int>());
+		
 		for (auto i = 0; i < n - 1; i++)
 		{
 			for (auto j = 0; j < n - i - 1; j++)
 			{
 				//Debug("添加比较");
-				AddCompareStep(stateList, j, j + 1);
+				AddCompareStep(stateList, j, j + 1, 1);
 				//executor->histogram->compareOnUI(j, j + 1); //比较j和j+1大小
 				if (executor->sortVector->GetAt(j) > executor->sortVector->GetAt(j + 1)) { //如果后者更大
 					//Debug("添加交换");
@@ -158,7 +161,7 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 					executor->sortVector->SetAt(j + 1, executor->sortVector->GetAt(j));
 					executor->sortVector->SetAt(j, temp);
 
-					AddSwapStep(stateList, j, j + 1);
+					AddSwapStep(stateList, j, j + 1, 2);
 				}
 				stateList->SetAt(j, (int)PillarState::Default);
 				//executor->histogram->setStateOnUI(j, PillarState::Default); //让前者恢复默认状态
@@ -295,6 +298,7 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 			stateList->Append((PillarState)i);
 		}
 		histogram->load(StepList->GetAt(index)->ThisState->GetAt(0), stateList);
+		ShowCodeChange(StepList->GetAt(index)->HighlightLines);
 		return StepList->GetAt(index);
 	}
 	else
@@ -329,6 +333,15 @@ AlgorithmVisualization::SortExcute::SortExcute()
 		int value = rand() % 99 + 1;
 		sortVector->Append(value);
 	}
+}
+
+void AlgorithmVisualization::SortExcute::ShowCodeChange(IVector<int>^ highlighters)
+{
+	auto generateRes = CodeDrawable->GenerateDrawable(highlighters);
+	CodeText->Blocks->Clear();
+	CodeText->Blocks->Append((Paragraph^)(generateRes->GetAt(0)));
+	CodeText->TextHighlighters->Clear();
+	CodeText->TextHighlighters->Append((TextHighlighter^)(generateRes->GetAt(1)));
 }
 
 /// <summary>
@@ -373,9 +386,10 @@ void AlgorithmVisualization::SortAlgoPage::Next_Click(Platform::Object^ sender, 
 	//Debug("当前步骤:" + executor->CurrentStep);
 }
 
-void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateList, int left, int right)
+void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine)
 {
 	auto compareStep = ref new SingleStep(0); //比较步骤
+	compareStep->HighlightLines->Append(highlightLine);
 	compareStep->ThisState->Append(Util::CopyVector(executor->sortVector));
 	stateList->SetAt(left, (int)PillarState::Compared);
 	stateList->SetAt(right, (int)PillarState::Compared);
@@ -383,9 +397,10 @@ void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateLis
 	executor->AddStep(compareStep);
 }
 
-void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, int left, int right)
+void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine)
 {
 	auto swapStep = ref new SingleStep(1);
+	swapStep->HighlightLines->Append(highlightLine);
 	swapStep->ThisState->Append(Util::CopyVector(executor->sortVector));
 	stateList->SetAt(left, (int)PillarState::Swapping);
 	stateList->SetAt(right, (int)PillarState::Swapping);
@@ -396,6 +411,7 @@ void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, 
 void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover)
 {
 	auto recoverStep = ref new SingleStep(2);
+	recoverStep->HighlightLines->Append(-1);
 	recoverStep->ThisState->Append(Util::CopyVector(executor->sortVector));
 	for (auto i : recover)
 	{
@@ -408,6 +424,7 @@ void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateLis
 void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete)
 {
 	auto endStep = ref new SingleStep(3);
+	endStep->HighlightLines->Append(-1);
 	endStep->ThisState->Append(Util::CopyVector(executor->sortVector));
 	for (auto i : complete)
 	{

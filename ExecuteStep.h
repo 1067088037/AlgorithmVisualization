@@ -23,6 +23,7 @@ namespace AlgorithmVisualization {
 		SingleStep(int type); //构造函数
 		
 		property int Type; //步骤的类型
+		property IVector<int>^ HighlightLines; //高亮显示的行数
 		property IVector<IVector<int>^>^ ThisState; //当前步骤的状态
 		property IVector<ExcuteInstruct^>^ ToNextStep; //运转到下一步的过程
 	};
