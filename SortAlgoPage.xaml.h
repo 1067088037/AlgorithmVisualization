@@ -62,7 +62,9 @@ namespace AlgorithmVisualization
 		void AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine); //新建交换步骤
 		void AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover); //新建恢复成默认状态的步骤
 		void AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete); //新建完成的步骤
-
+		void AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine); //添加选中的步骤
+		void AddAllCompleteStep(IVector<int>^ stateList); //全部完成
+		
 		void InitBubbleSort(); //初始化冒泡排序
 		void InitSelectionSort(); //初始化选择排序
 		void InitInsertionSort(); //初始化插入排序

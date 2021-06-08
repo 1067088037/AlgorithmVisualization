@@ -457,6 +457,41 @@ void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateLi
 }
 
 /// <summary>
+/// 添加选中状态
+/// </summary>
+/// <param name="stateList"></param>
+/// <param name="select"></param>
+void AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine)
+{
+	auto selectStep = ref new SingleStep(4);
+	selectStep->HighlightLines->Append(highlightLine);
+	selectStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	for (auto i : select)
+	{
+		stateList->SetAt(i, (int)PillarState::Selected); //遍历设为完成状态
+	}
+	selectStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(selectStep);
+}
+
+/// <summary>
+/// 全部完成
+/// </summary>
+/// <param name="stateList"></param>
+void AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ stateList)
+{
+	auto endStep = ref new SingleStep(3);
+	endStep->HighlightLines->Append(-1);
+	endStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	for (unsigned int i = 0; i < stateList->Size; ++i)
+	{
+		stateList->SetAt(i, (int)PillarState::Completed); //遍历设为完成状态
+	}
+	endStep->ThisState->Append(Util::CopyVector(stateList));
+	executor->AddStep(endStep);
+}
+
+/// <summary>
 /// 初始化冒泡排序算法
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitBubbleSort()
@@ -551,7 +586,47 @@ void AlgorithmVisualization::SortAlgoPage::InitSelectionSort()
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(n²)\n它的基本思想是将一个记录插入到已经排好序的有序表中，从而一个新的、记录数增1的有序表。在其实现过程使用双层循环，外层循环对除了第一个元素之外的所有元素，内层循环对当前元素前面有序表进行待插入位置查找，并进行移动。";
+
+	auto codeDrawable = executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("for (int i = 0; i < n; i++) {\n");
+	codeDrawable->Texts->Append("    for (int j = i; j > 0; j--) {\n");
+	codeDrawable->Texts->Append("        if (arr[j] < arr[j - 1])    \n");
+	codeDrawable->Texts->Append("            std::swap(arr[j], arr[j - 1]);    \n");
+	codeDrawable->Texts->Append("        else break;\n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)executor->sortVector->Size; //数字总数
+	auto stateList = ref new Vector<int>(n, (int)PillarState::Default); //实例化状态列表
+	AddRecoverStep(stateList, ref new Vector<int>()); //一开始加入一个空的步骤
+
+	for (int i = 0; i < n; i++) {
+		for (int j = i; j > 0; j--) {
+			AddCompareStep(stateList, j - 1, j, 2); //加入比较步骤
+			//恢复默认状态
+			stateList->SetAt(j, (int)PillarState::Default);
+			stateList->SetAt(j - 1, (int)PillarState::Default); 
+			if (executor->sortVector->GetAt(j) < executor->sortVector->GetAt(j - 1)) //比较
+			{
+				AddSwapStep(stateList, j - 1, j, 3); //添加交换步骤
+				//交换数据
+				int temp = executor->sortVector->GetAt(j);
+				executor->sortVector->SetAt(j, executor->sortVector->GetAt(j - 1));
+				executor->sortVector->SetAt(j - 1, temp);
+			}
+			else break;
+			//恢复默认状态
+			stateList->SetAt(j - 1, (int)PillarState::Default);
+			stateList->SetAt(j, (int)PillarState::Default);
+		}
+	}
+	
+	AddAllCompleteStep(stateList); //最后才完成
+	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
 }
 
 /// <summary>
