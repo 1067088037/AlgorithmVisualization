@@ -86,6 +86,8 @@ void AlgorithmVisualization::SortAlgoPage::SortNavView_Loaded(Platform::Object^ 
 void AlgorithmVisualization::SortAlgoPage::SortNavView_ItemInvoked(Microsoft::UI::Xaml::Controls::NavigationView^ sender, Microsoft::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
 	auto tag = args->InvokedItemContainer->Tag->ToString(); //获取点击Tag
+	executor->sortVector->Clear(); //清空向量
+	executor->StopTimer(); //关闭计时器
 	InitAlgorithm(tag); //初始化对应的算法
 }
 
@@ -106,6 +108,8 @@ void AlgorithmVisualization::SortAlgoPage::Debug_Click(Platform::Object^ sender,
 /// <param name="e"></param>
 void AlgorithmVisualization::SortAlgoPage::SortHistogram_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
+	lastHistogramWidth = e->NewSize.Width; //记录宽度
+	lastHistogramHeight = e->NewSize.Height; //记录高度
 	executor->histogram->onSizeChanged(e->NewSize.Width, e->NewSize.Height); //自适应布局调整大小
 }
 
@@ -115,12 +119,14 @@ void AlgorithmVisualization::SortAlgoPage::SortHistogram_SizeChanged(Platform::O
 /// <param name="tag"></param>
 void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 {
+	float width = lastHistogramWidth;
+	float height = 380.0; //不使用动态高度
 	if (AlgorithmType == 0)
-		executor = ref new SortExcute(20); //实例化排序可执行 初等排序设置小一点
+		executor = ref new SortExcute(20, width, height); //实例化排序可执行 初等排序设置小一点
 	else if (AlgorithmType == 1)
-		executor = ref new SortExcute(32); //实例化排序可执行 高等排序设置大一点
+		executor = ref new SortExcute(32, width, height); //实例化排序可执行 高等排序设置大一点
 	else if (AlgorithmType == 2)
-		executor = ref new SortExcute(32); //实例化排序可执行 高等排序设置大一点
+		executor = ref new SortExcute(32, width, height); //实例化排序可执行 高等排序设置大一点
 	executor->ProcessText = ProcessText;
 	executor->ProgressSlider = ProgressSlider;
 	executor->SpeedText = SpeedText;
@@ -138,14 +144,17 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	else if (tag == L"SelectionSort")
 	{
 		AlgorithmName->Text = L"选择排序";
+		InitSelectionSort();
 	}
 	else if (tag == L"InsertionSort")
 	{
 		AlgorithmName->Text = L"插入排序";
+		InitInsertionSort();
 	}
 	else if (tag == L"ShellSort")
 	{
 		AlgorithmName->Text = "希尔排序";
+		InitShellSort();
 	}
 	else if (tag == L"MergeSort")
 	{
@@ -172,6 +181,7 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 
 	}
 
+	SortHistogram->Children->Clear();
 	SortHistogram->Children->Append(executor->histogram->container); //向父级容器中添加柱状图的容器
 	executor->NavigateToFirst();
 }
@@ -305,10 +315,10 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToPrevious()
 /// 构造函数
 /// </summary>
 /// <param name="n">要排序的数字个数</param>
-AlgorithmVisualization::SortExcute::SortExcute(int n)
+AlgorithmVisualization::SortExcute::SortExcute(int n, float width, float height)
 {
 	DefaultInit(); //默认的初始化
-	histogram = ref new Histogram(); //初始化容器
+	histogram = ref new Histogram(width, height); //初始化容器
 	sortVector = ref new Vector<int>(); //初始化要排序的向量
 	for (int i = 0; i < n; ++i)
 	{
@@ -489,6 +499,67 @@ void AlgorithmVisualization::SortAlgoPage::InitBubbleSort()
 	AddCompleteStep(stateList, ref new Vector<int>{ 0 }); //加入完成步骤
 	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 初始化选择排序算法
+/// </summary>
+void AlgorithmVisualization::SortAlgoPage::InitSelectionSort()
+{
+	Introduction->Text = L"时间复杂度：O(n²)\n它的工作原理是：第一次从待排序的数据元素中选出最小（或最大）的一个元素，存放在序列的起始位置，然后再从剩余的未排序元素中寻找到最小（大）元素，然后放到已排序的序列的末尾。以此类推，直到全部待排序的数据元素的个数为零。选择排序是不稳定的排序方法。";
+
+	auto codeDrawable = executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("for (int i = 0; i < n - 1; ++i) {\n    int min = i;\n    for (int j = i + 1; j < n; ++j) {\n");
+	codeDrawable->Texts->Append("        if (arr[j] < arr[min]) min = j;    \n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("    swap(arr[i], arr[min]);    \n");
+	codeDrawable->Texts->Append("}");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)executor->sortVector->Size; //数字总数
+	auto stateList = ref new Vector<int>(n, (int)PillarState::Default); //实例化状态列表
+	AddRecoverStep(stateList, ref new Vector<int>()); //一开始加入一个空的步骤
+
+	for (int i = 0; i < n - 1; ++i) {
+		int min = i; //初始化最小的下标
+		for (int j = i + 1; j < n; ++j) {
+			AddCompareStep(stateList, min, j, 1); //加入比较步骤
+			if (executor->sortVector->GetAt(j) < executor->sortVector->GetAt(min)) { //如果新的更小
+				stateList->SetAt(min, (int)PillarState::Default); //取消之前的最小值
+				min = j;
+			}
+			stateList->SetAt(j, (int)PillarState::Default); //设置前者为默认状态
+		}
+		//交换i和min位置上的数字
+		int temp = executor->sortVector->GetAt(i);
+		executor->sortVector->SetAt(i, executor->sortVector->GetAt(min));
+		executor->sortVector->SetAt(min, temp);
+		//加入交换步骤
+		AddSwapStep(stateList, i, min, 3);
+		AddRecoverStep(stateList, ref new Vector<int>{ i, min });
+		AddCompleteStep(stateList, ref new Vector<int>{ i }); //加入完成步骤
+	}
+
+	AddCompleteStep(stateList, ref new Vector<int>{ n - 1 }); //加入完成步骤
+	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 初始化插入排序算法
+/// </summary>
+void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+/// <summary>
+/// 初始化希尔排序算法
+/// </summary>
+void AlgorithmVisualization::SortAlgoPage::InitShellSort()
+{
+	throw ref new Platform::NotImplementedException();
 }
 
 /// <summary>

@@ -33,8 +33,12 @@ int findMax(IVector<int>^ vec)
 /// <summary>
 /// 构造函数
 /// </summary>
-AlgorithmVisualization::Histogram::Histogram()
+/// <param name="_width"></param>
+/// <param name="_height"></param>
+AlgorithmVisualization::Histogram::Histogram(float _width, float _height)
 {
+	width = _width;
+	height = _height;
 	this->container = ref new StackPanel(); //创建堆栈面板
 	this->container->Orientation = Windows::UI::Xaml::Controls::Orientation::Horizontal; //设置堆栈面板为水平方向
 	pillars = ref new Vector<Pillar^>(); //清空柱体向量
@@ -57,7 +61,7 @@ void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<Pill
 	int _maxNumber = findMax(numbers); //找到最高的，以它为基准作图
 	maxNumber = _maxNumber;
 	int pillarWidth = (int)(width / numbers->Size); //计算宽度
-	for (int i = 0; i < numbers->Size; ++i)
+	for (unsigned int i = 0; i < numbers->Size; ++i)
 	{
 		int number = numbers->GetAt(i);
 		auto rect = ref new Rectangle(); //创建矩形
@@ -199,6 +203,9 @@ Color AlgorithmVisualization::Histogram::stateToColor(PillarState state)
 		break;
 	case PillarState::Completed:
 		color = CompletedColor;
+		break;
+	case PillarState::Selected:
+		color = SelectedColor;
 		break;
 	default:
 		break;

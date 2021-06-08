@@ -27,7 +27,7 @@ namespace AlgorithmVisualization
 		virtual SingleStep^ NavigateToNext() override; //导航到下一步
 		virtual SingleStep^ NavigateToPrevious() override; //导航到上一步
 
-		SortExcute(int n); //构造函数
+		SortExcute(int n, float width, float height); //构造函数
 		void ShowCodeChange(IVector<int>^ highlighters); //展示代码的改变
 
 		property Histogram^ histogram; //柱状图
@@ -51,6 +51,8 @@ namespace AlgorithmVisualization
 	private:
 		SortExcute^ executor; //算法执行器
 		int AlgorithmType = -1; //排序算法类型
+		float lastHistogramWidth = 980.0; //上次柱状图宽度
+		float lastHistogramHeight = 380.0; //上次柱状图高度
 
 		void InitAlgorithm(String^ tag); //初始化算法
 		void InitNavViewItems(int sortAlgorithmType); //初始化导航栏
@@ -62,6 +64,9 @@ namespace AlgorithmVisualization
 		void AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete); //新建完成的步骤
 
 		void InitBubbleSort(); //初始化冒泡排序
+		void InitSelectionSort(); //初始化选择排序
+		void InitInsertionSort(); //初始化插入排序
+		void InitShellSort(); //初始化希尔排序
 		
 		void Previous_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);

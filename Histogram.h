@@ -16,7 +16,8 @@ namespace AlgorithmVisualization {
 		Default = 0, //默认状态
 		Swapping = 1, //正在交换状态
 		Compared = 2, //正在比较状态
-		Completed = 3 //已完成
+		Completed = 3, //已完成
+		Selected = 4 //被选中
 	};
 
 	/// <summary>
@@ -46,7 +47,7 @@ namespace AlgorithmVisualization {
 	public ref class Histogram sealed
 	{
 	public:
-		Histogram();
+		Histogram(float _width, float _height);
 		void load(IVector<int>^ numbers); //绘制柱状图
 		void load(IVector<int>^ numbers, IVector<PillarState>^ states); //绘制柱状图
 		void swap(int left, int right); //交换两个柱体的位置
@@ -65,12 +66,13 @@ namespace AlgorithmVisualization {
 		int maxNumber = 0;
 		Vector<Pillar^>^ pillars; //柱体向量
 
-		float width = 980.0;
-		float height = 380.0;
+		float width{};
+		float height{};
 		
 		Color DefaultColor = Colors::Blue; //默认颜色
 		Color SwappingColor = Colors::Red; //正在交换颜色
 		Color ComparedColor = Colors::Green; //比较颜色
 		Color CompletedColor = Colors::Yellow; //完成颜色
+		Color SelectedColor = Colors::Orange; //选中颜色
 	};
 }
