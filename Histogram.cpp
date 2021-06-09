@@ -53,7 +53,23 @@ void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers)
 	load(numbers, ref new Vector<PillarState>(numbers->Size, PillarState::Default));
 }
 
+/// <summary>
+/// 载入
+/// </summary>
+/// <param name="numbers"></param>
+/// <param name="states"></param>
 void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<PillarState>^ states)
+{
+	load(numbers, states, ref new Vector<int>{});
+}
+
+/// <summary>
+/// 载入
+/// </summary>
+/// <param name="numbers"></param>
+/// <param name="states"></param>
+/// <param name="isTemp"></param>
+void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<PillarState>^ states, IVector<int>^ isTemp)
 {
 	container->Children->Clear(); //先清空原有的容器
 	pillars->Clear();
@@ -66,7 +82,9 @@ void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<Pill
 		int number = numbers->GetAt(i);
 		auto rect = ref new Rectangle(); //创建矩形
 		int pillarHeight = (int)(height * number / maxNumber); //计算高度
-		auto pillar = ref new Pillar{ number, pillarWidth, pillarHeight, stateToColor(states->GetAt(i)) }; //实例化柱体，设置合理的高度和宽度
+		unsigned int n = -1;
+		auto pillar = ref new Pillar{ number, pillarWidth, pillarHeight,
+			stateToColor(states->GetAt(i)), isTemp->IndexOf(i, &n) }; //实例化柱体，设置合理的高度和宽度
 		container->Children->Append(pillar->getView()); //追加进容器
 		pillars->Append(pillar); //追加到向量末尾
 	}
@@ -174,6 +192,11 @@ void AlgorithmVisualization::Histogram::setStatesOnUI(IVector<int>^ indexs, IVec
 	));
 }
 
+/// <summary>
+/// 尺寸改变回调
+/// </summary>
+/// <param name="_width"></param>
+/// <param name="_height"></param>
 void AlgorithmVisualization::Histogram::onSizeChanged(float _width, float _height)
 {
 	width = _width;
@@ -187,6 +210,11 @@ void AlgorithmVisualization::Histogram::onSizeChanged(float _width, float _heigh
 	}
 }
 
+/// <summary>
+/// 将状态转换为颜色
+/// </summary>
+/// <param name="state"></param>
+/// <returns></returns>
 Color AlgorithmVisualization::Histogram::stateToColor(PillarState state)
 {
 	Color color;
@@ -207,6 +235,9 @@ Color AlgorithmVisualization::Histogram::stateToColor(PillarState state)
 	case PillarState::Selected:
 		color = SelectedColor;
 		break;
+	case PillarState::SetValue:
+		color = SetValueColor;
+		break;
 	default:
 		break;
 	}
@@ -216,11 +247,23 @@ Color AlgorithmVisualization::Histogram::stateToColor(PillarState state)
 /// <summary>
 /// 构造函数
 /// </summary>
+/// <param name="_number"></param>
+/// <param name="width"></param>
+/// <param name="height"></param>
+/// <param name="color"></param>
+AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color color)
+{
+	Pillar(_number, width, height, color, false);
+}
+
+/// <summary>
+/// 构造函数
+/// </summary>
 /// <param name="width">宽度</param>
 /// <param name="height">高度</param>
 /// <param name="color">颜色</param>
 /// <param name="text">文字</param>
-AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color color)
+AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color color, bool temp)
 {
 	number = _number;
 	
@@ -235,15 +278,24 @@ AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color
 	rect->VerticalAlignment = Windows::UI::Xaml::VerticalAlignment::Bottom; //设置对齐方向为向底部对齐
 	rect->Fill = ref new SolidColorBrush(color); //上色
 
-	textBlock = ref new TextBlock(); //创建文本
-	textBlock->Width = width - margin * 2; //设置宽度
-	textBlock->Height = textHeight; //设置高度
-	textBlock->Text = number.ToString(); //写入文本
-	textBlock->HorizontalAlignment = HorizontalAlignment::Center; //设置对齐
-	textBlock->TextAlignment = TextAlignment::Center; //设置文本对齐
+	topTextBlock = ref new TextBlock(); //创建文本
+	topTextBlock->Width = width - margin * 2; //设置宽度
+	topTextBlock->Height = textHeight; //设置高度
+	if (temp) topTextBlock->Text = L"临时"; //写入文本
+	else topTextBlock->Text = L""; //写入文字
+	topTextBlock->HorizontalAlignment = HorizontalAlignment::Center; //设置对齐
+	topTextBlock->TextAlignment = TextAlignment::Center; //设置文本对齐
 
+	bottomTextBlock = ref new TextBlock(); //创建文本
+	bottomTextBlock->Width = width - margin * 2; //设置宽度
+	bottomTextBlock->Height = textHeight; //设置高度
+	bottomTextBlock->Text = number.ToString(); //写入文本
+	bottomTextBlock->HorizontalAlignment = HorizontalAlignment::Center; //设置对齐
+	bottomTextBlock->TextAlignment = TextAlignment::Center; //设置文本对齐
+
+	outBox->Children->Append(topTextBlock); //向堆栈面板中追加矩形
 	outBox->Children->Append(rect); //向堆栈面板中追加矩形
-	outBox->Children->Append(textBlock); //向堆栈面板中追加文字
+	outBox->Children->Append(bottomTextBlock); //向堆栈面板中追加文字
 }
 
 /// <summary>
@@ -255,11 +307,17 @@ Windows::UI::Xaml::Controls::StackPanel^ AlgorithmVisualization::Pillar::getView
 	return outBox;
 }
 
+/// <summary>
+/// 修改尺寸
+/// </summary>
+/// <param name="_width"></param>
+/// <param name="_height"></param>
 void AlgorithmVisualization::Pillar::resize(int _width, int _height)
 {
 	int newWidth = max(_width - margin * 2, 2);
 	int newHeight= max(_height, 2);
 	rect->Width = newWidth; //设置宽度
 	rect->Height = newHeight; //设置高度
-	textBlock->Width = newWidth; //设置宽度
+	topTextBlock->Width = newWidth; //设置宽度
+	bottomTextBlock->Width = newWidth; //设置宽度
 }

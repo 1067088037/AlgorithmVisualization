@@ -17,10 +17,6 @@
                              IsSettingsVisible="False">
             <ScrollViewer>
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="500" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="1*" />
@@ -32,9 +28,35 @@
                         <Grid x:Name="SortHistogram" Margin="6" SizeChanged="SortHistogram_SizeChanged">
 
                         </Grid>
-                    </StackPanel>
-                    <StackPanel x:Name="SortArray" Grid.Row="1" Grid.Column="0" Margin="6">
-                        <TextBlock FontSize="24">数组</TextBlock>
+                        <TextBlock FontSize="24" Margin="6 24 6 6">图例</TextBlock>
+                        <Grid x:Name="SortHistogramLegend" Margin="6">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="Blue"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">默认</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="Red"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">交换</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="Green"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">比较</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="Yellow"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">完成</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="Orange"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">选中</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="12">
+                                    <Rectangle Width="50" Height="50" Fill="HotPink"></Rectangle>
+                                    <TextBlock TextAlignment="Center" Margin="6">赋值</TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                     <StackPanel x:Name="SortDetail" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6">
                         <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>

@@ -51,19 +51,23 @@ namespace AlgorithmVisualization
 	private:
 		SortExcute^ executor; //算法执行器
 		int AlgorithmType = -1; //排序算法类型
+		const float defaultHeight = 410.0; //默认高度
 		float lastHistogramWidth = 980.0; //上次柱状图宽度
-		float lastHistogramHeight = 380.0; //上次柱状图高度
+		float lastHistogramHeight = defaultHeight; //上次柱状图高度
 
 		void InitAlgorithm(String^ tag); //初始化算法
 		void InitNavViewItems(int sortAlgorithmType); //初始化导航栏
 		void Debug(String^ message); //显示调试信息
 		void StartThreadTimer(); //开始计时器线程
-		void AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine); //新建比较步骤
-		void AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine); //新建交换步骤
-		void AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover); //新建恢复成默认状态的步骤
-		void AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete); //新建完成的步骤
-		void AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine); //添加选中的步骤
-		void AddAllCompleteStep(IVector<int>^ stateList); //全部完成
+		bool AddEmptyStep(IVector<int>^ stateList, IVector<int>^ isTemp = ref new Vector<int>()); //添加空步骤
+		bool AddSetStep(IVector<int>^ stateList, int pos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加设置步骤
+		bool AddSetFromToStep(IVector<int>^ stateList, int from, int to, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加有来源的步骤
+		bool AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建比较步骤
+		bool AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建交换步骤
+		bool AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover, IVector<int>^ isTemp = ref new Vector<int>()); //新建恢复成默认状态的步骤
+		bool AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete, IVector<int>^ isTemp = ref new Vector<int>()); //新建完成的步骤
+		bool AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加选中的步骤
+		bool AddAllCompleteStep(IVector<int>^ stateList, IVector<int>^ isTemp = ref new Vector<int>()); //全部完成
 		
 		void InitBubbleSort(); //初始化冒泡排序
 		void InitSelectionSort(); //初始化选择排序

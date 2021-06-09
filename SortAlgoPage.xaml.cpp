@@ -120,7 +120,7 @@ void AlgorithmVisualization::SortAlgoPage::SortHistogram_SizeChanged(Platform::O
 void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 {
 	float width = lastHistogramWidth;
-	float height = 380.0; //不使用动态高度
+	float height = defaultHeight; //不使用动态高度
 	if (AlgorithmType == 0)
 		executor = ref new SortExcute(20, width, height); //实例化排序可执行 初等排序设置小一点
 	else if (AlgorithmType == 1)
@@ -276,12 +276,17 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 	ProgressSlider->Value = CurrentStep;
 	if (index >= 0 && index < (int)StepList->Size)
 	{
+		auto thisStep = StepList->GetAt(index);
 		auto stateList = ref new Vector<PillarState>(); //实例化状态列表
-		for (int i : StepList->GetAt(index)->ThisState->GetAt(1))
+		for (int i : thisStep->ThisState->GetAt(1))
 		{
 			stateList->Append((PillarState)i);
 		}
-		histogram->load(StepList->GetAt(index)->ThisState->GetAt(0), stateList); //加载步骤的内容
+		if (thisStep->ThisState->Size == 2) //没有临时变量的时候
+			histogram->load(thisStep->ThisState->GetAt(0), stateList); //加载步骤的内容
+		else //有临时变量
+			histogram->load(thisStep->ThisState->GetAt(0), stateList, thisStep->ThisState->GetAt(2)); //加载步骤的内容
+		int i = thisStep->ThisState->Size;
 		ShowCodeChange(StepList->GetAt(index)->HighlightLines); //显示代码的变化
 		return StepList->GetAt(index);
 	}
@@ -383,13 +388,59 @@ void AlgorithmVisualization::SortAlgoPage::Next_Click(Platform::Object^ sender, 
 }
 
 /// <summary>
+/// 添加空步骤
+/// </summary>
+/// <param name="stateList"></param>
+bool AlgorithmVisualization::SortAlgoPage::AddEmptyStep(IVector<int>^ stateList, IVector<int>^ isTemp)
+{
+	auto emptyStep = ref new SingleStep(0); //比较步骤
+	emptyStep->HighlightLines->Append(-1);
+	emptyStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	emptyStep->ThisState->Append(Util::CopyVector(stateList));
+	emptyStep->ThisState->Append(isTemp);
+	executor->AddStep(emptyStep);
+	return true;
+}
+
+/// <summary>
+/// 添加设定步骤
+/// </summary>
+/// <param name="stateList"></param>
+/// <param name="pos"></param>
+/// <param name="highlightLine"></param>
+bool AlgorithmVisualization::SortAlgoPage::AddSetStep(IVector<int>^ stateList, int pos, int highlightLine, IVector<int>^ isTemp)
+{
+	auto setStep = ref new SingleStep(0); //设置步骤
+	setStep->HighlightLines->Append(highlightLine);
+	setStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	stateList->SetAt(pos, (int)PillarState::SetValue); //设置去向
+	setStep->ThisState->Append(Util::CopyVector(stateList));
+	setStep->ThisState->Append(isTemp);
+	executor->AddStep(setStep);
+	return true;
+}
+
+bool AlgorithmVisualization::SortAlgoPage::AddSetFromToStep(IVector<int>^ stateList, int from, int to, int highlightLine, IVector<int>^ isTemp)
+{
+	auto setStep = ref new SingleStep(0); //设置步骤
+	setStep->HighlightLines->Append(highlightLine);
+	setStep->ThisState->Append(Util::CopyVector(executor->sortVector));
+	stateList->SetAt(from, (int)PillarState::Selected); //设置来源
+	stateList->SetAt(to, (int)PillarState::SetValue); //设置去向
+	setStep->ThisState->Append(Util::CopyVector(stateList));
+	setStep->ThisState->Append(isTemp);
+	executor->AddStep(setStep);
+	return true;
+}
+
+/// <summary>
 /// 添加比较步骤
 /// </summary>
 /// <param name="stateList">状态列表</param>
 /// <param name="left">左数字</param>
 /// <param name="right">右数字</param>
 /// <param name="highlightLine">高亮行</param>
-void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine)
+bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateList, int left, int right, int highlightLine, IVector<int>^ isTemp)
 {
 	auto compareStep = ref new SingleStep(0); //比较步骤
 	compareStep->HighlightLines->Append(highlightLine);
@@ -398,7 +449,9 @@ void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateLis
 	stateList->SetAt(left, (int)PillarState::Compared);
 	stateList->SetAt(right, (int)PillarState::Compared);
 	compareStep->ThisState->Append(Util::CopyVector(stateList));
+	compareStep->ThisState->Append(isTemp);
 	executor->AddStep(compareStep);
+	return true;
 }
 
 /// <summary>
@@ -408,7 +461,7 @@ void AlgorithmVisualization::SortAlgoPage::AddCompareStep(IVector<int>^ stateLis
 /// <param name="left">左位置</param>
 /// <param name="right">右位置</param>
 /// <param name="highlightLine">高亮行数</param>
-void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine)
+bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, int left, int right, int highlightLine, IVector<int>^ isTemp)
 {
 	auto swapStep = ref new SingleStep(1);
 	swapStep->HighlightLines->Append(highlightLine);
@@ -417,7 +470,9 @@ void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, 
 	stateList->SetAt(left, (int)PillarState::Swapping);
 	stateList->SetAt(right, (int)PillarState::Swapping);
 	swapStep->ThisState->Append(Util::CopyVector(stateList));
+	swapStep->ThisState->Append(isTemp);
 	executor->AddStep(swapStep);
+	return true;
 }
 
 /// <summary>
@@ -425,7 +480,7 @@ void AlgorithmVisualization::SortAlgoPage::AddSwapStep(IVector<int>^ stateList, 
 /// </summary>
 /// <param name="stateList">状态列表</param>
 /// <param name="recover">恢复位置</param>
-void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover)
+bool AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateList, IVector<int>^ recover, IVector<int>^ isTemp)
 {
 	auto recoverStep = ref new SingleStep(2);
 	recoverStep->HighlightLines->Append(-1);
@@ -435,7 +490,9 @@ void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateLis
 		stateList->SetAt(i, (int)PillarState::Default); //遍历设为默认状态
 	}
 	recoverStep->ThisState->Append(Util::CopyVector(stateList));
+	recoverStep->ThisState->Append(isTemp);
 	executor->AddStep(recoverStep);
+	return true;
 }
 
 /// <summary>
@@ -443,7 +500,7 @@ void AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ stateLis
 /// </summary>
 /// <param name="stateList">状态列表</param>
 /// <param name="complete">完成的位置</param>
-void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete)
+bool AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateList, IVector<int>^ complete, IVector<int>^ isTemp)
 {
 	auto endStep = ref new SingleStep(3);
 	endStep->HighlightLines->Append(-1);
@@ -453,7 +510,9 @@ void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateLi
 		stateList->SetAt(i, (int)PillarState::Completed); //遍历设为完成状态
 	}
 	endStep->ThisState->Append(Util::CopyVector(stateList));
+	endStep->ThisState->Append(isTemp);
 	executor->AddStep(endStep);
+	return true;
 }
 
 /// <summary>
@@ -461,7 +520,7 @@ void AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ stateLi
 /// </summary>
 /// <param name="stateList"></param>
 /// <param name="select"></param>
-void AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine)
+bool AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ stateList, IVector<int>^ select, int highlightLine, IVector<int>^ isTemp)
 {
 	auto selectStep = ref new SingleStep(4);
 	selectStep->HighlightLines->Append(highlightLine);
@@ -471,14 +530,16 @@ void AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ stateList
 		stateList->SetAt(i, (int)PillarState::Selected); //遍历设为完成状态
 	}
 	selectStep->ThisState->Append(Util::CopyVector(stateList));
+	selectStep->ThisState->Append(isTemp);
 	executor->AddStep(selectStep);
+	return true;
 }
 
 /// <summary>
 /// 全部完成
 /// </summary>
 /// <param name="stateList"></param>
-void AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ stateList)
+bool AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ stateList, IVector<int>^ isTemp)
 {
 	auto endStep = ref new SingleStep(3);
 	endStep->HighlightLines->Append(-1);
@@ -488,7 +549,9 @@ void AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ stat
 		stateList->SetAt(i, (int)PillarState::Completed); //遍历设为完成状态
 	}
 	endStep->ThisState->Append(Util::CopyVector(stateList));
+	endStep->ThisState->Append(isTemp);
 	executor->AddStep(endStep);
+	return true;
 }
 
 /// <summary>
@@ -624,7 +687,7 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 		}
 	}
 	
-	AddAllCompleteStep(stateList); //最后才完成
+	AddAllCompleteStep(stateList); //最后全部完成
 	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
 }
@@ -634,7 +697,72 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(n²)\n希尔排序是直接插入排序算法的一种更高效的改进版本，是非稳定排序算法。希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至 1 时，整个文件恰被分成一组，算法便终止。";
+
+	auto codeDrawable = executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("for (int gap = n / 2; gap > 0; gap /= 2) {\n");
+	codeDrawable->Texts->Append("    for (int i = gap; i < n; ++i) {\n");
+	codeDrawable->Texts->Append("        int temp = arr[i];    \n");
+	codeDrawable->Texts->Append("        int j;\n");
+	codeDrawable->Texts->Append("        for (j = i; j >= gap; j -= gap) {\n");
+	codeDrawable->Texts->Append("            if (temp < arr[j - gap])    \n");
+	codeDrawable->Texts->Append("                arr[j] = arr[j - gap];    \n");
+	codeDrawable->Texts->Append("            else break;    \n");
+	codeDrawable->Texts->Append("        }\n");
+	codeDrawable->Texts->Append("        arr[j] = temp;    \n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)executor->sortVector->Size; //数字总数
+	auto stateList = ref new Vector<int>(n, (int)PillarState::Default); //实例化状态列表
+	AddRecoverStep(stateList, ref new Vector<int>()); //一开始加入一个空的步骤
+	
+	executor->sortVector->Append(0); //临时变量
+	stateList->Append((int)PillarState::Default); //临时变量
+	auto isTemp = ref new Vector<int>{ n };
+	AddEmptyStep(stateList, isTemp);
+
+	for (int gap = n / 2; gap > 0; gap /= 2) {
+		for (int i = gap; i < n; ++i) {
+			executor->sortVector->SetAt(n, executor->sortVector->GetAt(i));
+			AddSetFromToStep(stateList, i, n, 2, isTemp);
+			stateList->SetAt(i, (int)PillarState::Default);
+			int j;
+			for (j = i; j >= gap; j -= gap) {
+				AddCompareStep(stateList, j - gap, n, 5, isTemp);
+				stateList->SetAt(n, (int)PillarState::Default);
+				stateList->SetAt(j - gap, (int)PillarState::Default);
+				if (executor->sortVector->GetAt(n) < executor->sortVector->GetAt(j - gap))
+				{
+					executor->sortVector->SetAt(j, executor->sortVector->GetAt(j - gap));
+					stateList->SetAt(n, (int)PillarState::Default);
+					AddSetFromToStep(stateList, j - gap, j, 6, isTemp);
+					stateList->SetAt(j, (int)PillarState::Default);
+				}
+				else break;
+			}
+			executor->sortVector->SetAt(j, executor->sortVector->GetAt(n));
+			AddSetFromToStep(stateList, n, j, 9, isTemp);
+			stateList->SetAt(j, (int)PillarState::Default);
+		}
+	}
+
+	for (auto &i : stateList)
+	{
+		i = (int)PillarState::Completed;
+	}
+	stateList->SetAt(n, (int)PillarState::Default); //临时变量
+	AddEmptyStep(stateList, isTemp);
+
+	//移除临时变量
+	executor->sortVector->RemoveAtEnd();
+	stateList->RemoveAtEnd();
+	AddEmptyStep(stateList, isTemp);
+	
+	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
 }
 
 /// <summary>
