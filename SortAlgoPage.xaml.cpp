@@ -158,27 +158,33 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	}
 	else if (tag == L"MergeSort")
 	{
-
+		AlgorithmName->Text = "归并排序";
+		InitMergeSort();
 	}
 	else if (tag == L"QuickSort")
 	{
-
+		AlgorithmName->Text = "快速排序";
+		InitQuickSort();
 	}
 	else if (tag == L"HeapSort")
 	{
-
+		AlgorithmName->Text = "堆排序";
+		InitHeapSort();
 	}
 	else if (tag == L"CountingSort")
 	{
-
+		AlgorithmName->Text = "计数排序";
+		InitCountingSort();
 	}
 	else if (tag == L"BucketSort")
 	{
-
+		AlgorithmName->Text = "桶排序";
+		InitBucketSort();
 	}
 	else if (tag == L"RadixSort")
 	{
-
+		AlgorithmName->Text = "基数排序";
+		InitRadixSort();
 	}
 
 	SortHistogram->Children->Clear();
@@ -763,6 +769,39 @@ void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 	
 	ProcessText->Text = "0/" + (executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 初始化归并排序
+/// </summary>
+void AlgorithmVisualization::SortAlgoPage::InitMergeSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+void AlgorithmVisualization::SortAlgoPage::InitQuickSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+void AlgorithmVisualization::SortAlgoPage::InitHeapSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+void AlgorithmVisualization::SortAlgoPage::InitBucketSort()
+{
+	throw ref new Platform::NotImplementedException();
+}
+
+void AlgorithmVisualization::SortAlgoPage::InitRadixSort()
+{
+	throw ref new Platform::NotImplementedException();
 }
 
 /// <summary>

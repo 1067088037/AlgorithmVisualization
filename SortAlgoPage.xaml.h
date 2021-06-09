@@ -73,6 +73,12 @@ namespace AlgorithmVisualization
 		void InitSelectionSort(); //初始化选择排序
 		void InitInsertionSort(); //初始化插入排序
 		void InitShellSort(); //初始化希尔排序
+		void InitMergeSort(); //初始化归并排序
+		void InitQuickSort(); //初始化快速排序
+		void InitHeapSort(); //初始化堆排序
+		void InitCountingSort(); //初始化计数排序
+		void InitBucketSort(); //初始化桶排序
+		void InitRadixSort(); //初始化基数排序
 		
 		void Previous_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
