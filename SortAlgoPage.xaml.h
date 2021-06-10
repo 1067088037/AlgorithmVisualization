@@ -70,21 +70,28 @@ namespace AlgorithmVisualization
 		void StartThreadTimer(); //开始计时器线程
 
 		void InitAssistStep(SingleStep^ step); //初始化辅助步骤
-		bool AddEmptyStep(IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //添加空步骤
-		bool AddSetStep(int pos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //添加设置步骤
-		bool AddSetFromToStep(int from, int to, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //添加有来源的步骤
-		bool AddCompareStep(int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //新建比较步骤
-		bool AddSwapStep(int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //新建交换步骤
-		bool AddRecoverStep(IVector<int>^ recover, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //新建恢复成默认状态的步骤
-		bool AddCompleteStep(IVector<int>^ complete, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //新建完成的步骤
-		bool AddSelectStep(IVector<int>^ select, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //添加选中的步骤
-		bool AddAllCompleteStep(IVector<int>^ isTemp = ref new Vector<int>(), int histogramIndex = 0); //全部完成
+		bool AddEmptyStep(IVector<int>^ isTemp = ref new Vector<int>()); //添加空步骤
+		bool AddSetStep(int pos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加设置步骤
+		bool AddSetFromToStep(int from, int to, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加有来源的步骤
+		bool AddSetFromToStep(int fromHis, int fromPos, int toHis, int toPos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建跨柱状图的有来源步骤
+		bool AddCompareStep(int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建比较步骤
+		bool AddCompareStep(int leftHisIndex, int leftPos, int rightHisIndex, int rightPos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建跨柱状图的比较
+		bool AddSwapStep(int left, int right, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建交换步骤
+		bool AddSwapStep(int leftHisIndex, int leftPos, int rightHisIndex, int rightPos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //新建跨柱状图的交换
+		bool SetToDefault(int his0, int index0, int his1, int index1); //设置为默认状态
+		bool AddRecoverStep(IVector<int>^ recover, IVector<int>^ isTemp = ref new Vector<int>()); //新建恢复成默认状态的步骤
+		bool AddCompleteStep(IVector<int>^ complete, IVector<int>^ isTemp = ref new Vector<int>()); //新建完成的步骤
+		bool AddSelectStep(IVector<int>^ select, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加选中的步骤
+		bool AddAllCompleteStep(IVector<int>^ isTemp = ref new Vector<int>()); //全部完成
+		bool AddAllCompleteStep(int hisIndex, IVector<int>^ isTemp = ref new Vector<int>()); //全部完成
 		
 		void InitBubbleSort(); //初始化冒泡排序
 		void InitSelectionSort(); //初始化选择排序
 		void InitInsertionSort(); //初始化插入排序
 		void InitShellSort(); //初始化希尔排序
 		void InitMergeSort(); //初始化归并排序
+		void Merge(IVector<int>^ data, int start, int end, IVector<int>^ result); //分割
+		void MergeSort(IVector<int>^ data, int start, int end, IVector<int>^ result); //归并排序
 		void InitQuickSort(); //初始化快速排序
 		void InitHeapSort(); //初始化堆排序
 		void InitCountingSort(); //初始化计数排序

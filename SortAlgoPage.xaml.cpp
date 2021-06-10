@@ -338,14 +338,14 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 		//ThisState中[0]保存主柱状图数组
 		//ThisState中[1]保存主柱状图数组的状态
 		//ThisState中[2]保存主柱状图数组的临时标签
-		
+
 		//ThisState中[3]保存辅助柱状图数组
 		//ThisState中[4]保存辅助柱状图数组的状态
-		
+
 		auto thisStep = StepList->GetAt(index);
 		auto mainStateList = ref new Vector<PillarState>(); //实例化状态列表
 		auto assistStateList = ref new Vector<PillarState>(); //实例化状态列表
-		
+
 		for (int i : thisStep->ThisState->GetAt(1))
 		{
 			mainStateList->Append((PillarState)i);
@@ -366,7 +366,7 @@ SingleStep^ AlgorithmVisualization::SortExcute::NavigateToStep(int index)
 
 		if (NeedAssistHistogram)
 			AssistHistogram->load(thisStep->ThisState->GetAt(3), assistStateList); //加载步骤的内容
-		
+
 		int i = thisStep->ThisState->Size;
 		ShowCodeChange(StepList->GetAt(index)->HighlightLines); //显示代码的变化
 		return StepList->GetAt(index);
@@ -503,7 +503,7 @@ void AlgorithmVisualization::SortAlgoPage::InitAssistStep(SingleStep^ step)
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddEmptyStep(IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddEmptyStep(IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(0); //比较步骤
 	tempStep->HighlightLines->Append(-1);
@@ -523,7 +523,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddEmptyStep(IVector<int>^ isTemp, in
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddSetStep(int pos, int highlightLine, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddSetStep(int pos, int highlightLine, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(0); //设置步骤
 	tempStep->HighlightLines->Append(highlightLine);
@@ -545,13 +545,41 @@ bool AlgorithmVisualization::SortAlgoPage::AddSetStep(int pos, int highlightLine
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddSetFromToStep(int from, int to, int highlightLine, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddSetFromToStep(int from, int to, int highlightLine, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(0); //设置步骤
 	tempStep->HighlightLines->Append(highlightLine);
 	tempStep->ThisState->Append(Util::CopyVector(Executor->SortVector));
 	Executor->SortStates->SetAt(from, (int)PillarState::Selected); //设置来源
 	Executor->SortStates->SetAt(to, (int)PillarState::SetValue); //设置去向
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
+	tempStep->ThisState->Append(isTemp);
+	InitAssistStep(tempStep);
+	Executor->AddStep(tempStep);
+	return true;
+}
+
+/// <summary>
+/// 新建跨柱状图的有来源步骤
+/// </summary>
+/// <param name="fromHis"></param>
+/// <param name="fromPos"></param>
+/// <param name="toHis"></param>
+/// <param name="toPos"></param>
+/// <param name="highlightLine"></param>
+/// <param name="isTemp"></param>
+/// <returns></returns>
+bool AlgorithmVisualization::SortAlgoPage::AddSetFromToStep(int fromHis, int fromPos, int toHis, int toPos, int highlightLine, IVector<int>^ isTemp)
+{
+	auto tempStep = ref new SingleStep(0); //设置步骤
+	tempStep->HighlightLines->Append(highlightLine);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortVector));
+	//获取合适的状态向量
+	IVector<int>^ leftHisStates = fromHis == 0 ? Executor->SortStates : Executor->AssistStates;
+	IVector<int>^ rightHisStates = toHis == 0 ? Executor->SortStates : Executor->AssistStates;
+	//设置来源和去向
+	leftHisStates->SetAt(fromPos, (int)PillarState::Selected); //设置来源
+	rightHisStates->SetAt(toPos, (int)PillarState::SetValue); //设置去向
 	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
 	tempStep->ThisState->Append(isTemp);
 	InitAssistStep(tempStep);
@@ -568,7 +596,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddSetFromToStep(int from, int to, in
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(int left, int right, int highlightLine, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(int left, int right, int highlightLine, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(0); //比较步骤
 	tempStep->HighlightLines->Append(highlightLine);
@@ -576,6 +604,34 @@ bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(int left, int right, i
 	//设置两个位置为比较状态
 	Executor->SortStates->SetAt(left, (int)PillarState::Compared);
 	Executor->SortStates->SetAt(right, (int)PillarState::Compared);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
+	tempStep->ThisState->Append(isTemp);
+	InitAssistStep(tempStep);
+	Executor->AddStep(tempStep);
+	return true;
+}
+
+/// <summary>
+/// 添加跨柱状图的比较
+/// </summary>
+/// <param name="leftHisIndex"></param>
+/// <param name="leftPos"></param>
+/// <param name="rightHisIndex"></param>
+/// <param name="rightPos"></param>
+/// <param name="highlightLine"></param>
+/// <param name="isTemp"></param>
+/// <returns></returns>
+bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(int leftHisIndex, int leftPos, int rightHisIndex, int rightPos, int highlightLine, IVector<int>^ isTemp)
+{
+	auto tempStep = ref new SingleStep(0); //比较步骤
+	tempStep->HighlightLines->Append(highlightLine);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortVector));
+	//获取合适的状态向量
+	IVector<int>^ leftHisStates = leftHisIndex == 0 ? Executor->SortStates : Executor->AssistStates;
+	IVector<int>^ rightHisStates = rightHisIndex == 0 ? Executor->SortStates : Executor->AssistStates;
+	//设置两个位置为比较状态
+	leftHisStates->SetAt(leftPos, (int)PillarState::Compared);
+	rightHisStates->SetAt(rightPos, (int)PillarState::Compared);
 	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
 	tempStep->ThisState->Append(isTemp);
 	InitAssistStep(tempStep);
@@ -592,7 +648,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddCompareStep(int left, int right, i
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(int left, int right, int highlightLine, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(int left, int right, int highlightLine, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(1);
 	tempStep->HighlightLines->Append(highlightLine);
@@ -608,13 +664,51 @@ bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(int left, int right, int 
 }
 
 /// <summary>
+/// 添加跨柱状图的交换
+/// </summary>
+/// <param name="leftHisIndex"></param>
+/// <param name="leftPos"></param>
+/// <param name="rightHisIndex"></param>
+/// <param name="rightPos"></param>
+/// <param name="highlightLine"></param>
+/// <param name="isTemp"></param>
+/// <returns></returns>
+bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(int leftHisIndex, int leftPos, int rightHisIndex, int rightPos, int highlightLine, IVector<int>^ isTemp)
+{
+	auto tempStep = ref new SingleStep(1);
+	tempStep->HighlightLines->Append(highlightLine);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortVector));
+	//获取合适的状态向量
+	IVector<int>^ leftHisStates = leftHisIndex == 0 ? Executor->SortStates : Executor->AssistStates;
+	IVector<int>^ rightHisStates = rightHisIndex == 0 ? Executor->SortStates : Executor->AssistStates;
+	//设置两个位置为交换状态
+	leftHisStates->SetAt(leftPos, (int)PillarState::Swapping);
+	rightHisStates->SetAt(rightPos, (int)PillarState::Swapping);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
+	tempStep->ThisState->Append(isTemp);
+	InitAssistStep(tempStep);
+	Executor->AddStep(tempStep);
+	return true;
+}
+
+bool AlgorithmVisualization::SortAlgoPage::SetToDefault(int his0, int index0, int his1, int index1)
+{
+	//获取合适的状态向量
+	IVector<int>^ leftHisStates = his0 == 0 ? Executor->SortStates : Executor->AssistStates;
+	IVector<int>^ rightHisStates = his1 == 0 ? Executor->SortStates : Executor->AssistStates;
+	leftHisStates->SetAt(index0, (int)PillarState::Default);
+	rightHisStates->SetAt(index1, (int)PillarState::Default);
+	return true;
+}
+
+/// <summary>
 /// 添加恢复步骤
 /// </summary>
 /// <param name="recover"></param>
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ recover, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ recover, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(2);
 	tempStep->HighlightLines->Append(-1);
@@ -637,7 +731,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddRecoverStep(IVector<int>^ recover,
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ complete, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ complete, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(3);
 	tempStep->HighlightLines->Append(-1);
@@ -661,7 +755,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddCompleteStep(IVector<int>^ complet
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ select, int highlightLine, IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ select, int highlightLine, IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(4);
 	tempStep->HighlightLines->Append(highlightLine);
@@ -683,7 +777,7 @@ bool AlgorithmVisualization::SortAlgoPage::AddSelectStep(IVector<int>^ select, i
 /// <param name="isTemp"></param>
 /// <param name="histogramIndex"></param>
 /// <returns></returns>
-bool AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ isTemp, int histogramIndex)
+bool AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ isTemp)
 {
 	auto tempStep = ref new SingleStep(3);
 	tempStep->HighlightLines->Append(-1);
@@ -691,6 +785,29 @@ bool AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(IVector<int>^ isTe
 	for (unsigned int i = 0; i < Executor->SortStates->Size; ++i)
 	{
 		Executor->SortStates->SetAt(i, (int)PillarState::Completed); //遍历设为完成状态
+	}
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
+	tempStep->ThisState->Append(isTemp);
+	InitAssistStep(tempStep);
+	Executor->AddStep(tempStep);
+	return true;
+}
+
+/// <summary>
+/// 设置跨柱状图的全部完成
+/// </summary>
+/// <param name="hisIndex"></param>
+/// <param name="isTemp"></param>
+/// <returns></returns>
+bool AlgorithmVisualization::SortAlgoPage::AddAllCompleteStep(int hisIndex, IVector<int>^ isTemp)
+{
+	auto tempStep = ref new SingleStep(3);
+	tempStep->HighlightLines->Append(-1);
+	tempStep->ThisState->Append(Util::CopyVector(Executor->SortVector));
+	IVector<int>^ hisStates = hisIndex == 0 ? Executor->SortStates : Executor->AssistStates;
+	for (unsigned int i = 0; i < Executor->SortStates->Size; ++i)
+	{
+		hisStates->SetAt(i, (int)PillarState::Completed); //遍历设为完成状态
 	}
 	tempStep->ThisState->Append(Util::CopyVector(Executor->SortStates));
 	tempStep->ThisState->Append(isTemp);
@@ -816,7 +933,7 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 			AddCompareStep(j - 1, j, 2); //加入比较步骤
 			//恢复默认状态
 			stateList->SetAt(j, (int)PillarState::Default);
-			stateList->SetAt(j - 1, (int)PillarState::Default); 
+			stateList->SetAt(j - 1, (int)PillarState::Default);
 			if (Executor->SortVector->GetAt(j) < Executor->SortVector->GetAt(j - 1)) //比较
 			{
 				AddSwapStep(j - 1, j, 3); //添加交换步骤
@@ -831,7 +948,7 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 			stateList->SetAt(j, (int)PillarState::Default);
 		}
 	}
-	
+
 	AddAllCompleteStep(stateList); //最后全部完成
 	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
@@ -863,7 +980,7 @@ void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 	auto n = (int)Executor->SortVector->Size; //数字总数
 	auto stateList = Executor->SortStates; //获取状态列表
 	AddRecoverStep(ref new Vector<int>()); //一开始加入一个空的步骤
-	
+
 	Executor->SortVector->Append(0); //临时变量
 	stateList->Append((int)PillarState::Default); //临时变量
 	auto isTemp = ref new Vector<int>{ n };
@@ -894,7 +1011,7 @@ void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 		}
 	}
 
-	for (auto &i : stateList)
+	for (auto& i : stateList)
 	{
 		i = (int)PillarState::Completed;
 	}
@@ -905,7 +1022,7 @@ void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 	Executor->SortVector->RemoveAtEnd();
 	stateList->RemoveAtEnd();
 	AddEmptyStep(isTemp);
-	
+
 	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
 }
@@ -919,39 +1036,156 @@ void AlgorithmVisualization::SortAlgoPage::InitMergeSort()
 
 	auto codeDrawable = Executor->CodeDrawable;
 	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("void merge(int *data, int start, int end, int *result) {\n    int left_length = (end - start + 1) / 2 + 1;\n    int left_index = start;\n    int right_index = start + left_length;\n    int result_index = start;\n    while (left_index < start + left_length && right_index < end + 1) {\n");
+	codeDrawable->Texts->Append("        if (data[left_index] <= data[right_index])    \n");
+	codeDrawable->Texts->Append("            result[result_index++] = data[left_index++];    \n");
+	codeDrawable->Texts->Append("        else\n");
+	codeDrawable->Texts->Append("            result[result_index++] = data[right_index++];    \n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("    while (left_index < start + left_length)\n        result[result_index++] = data[left_index++];    \n");
+	codeDrawable->Texts->Append("    while (right_index < end + 1)\n        result[result_index++] = data[right_index++];    \n");
+	codeDrawable->Texts->Append("}\n\n");
+	codeDrawable->Texts->Append("void merge_sort(int *data, int start, int end, int *result) {\n    if (1 == end - start) {\n");
+	codeDrawable->Texts->Append("        if (data[start] > data[end])    \n");
+	codeDrawable->Texts->Append("            std::swap(data[start], data[end]);    \n");
+	codeDrawable->Texts->Append("        return;\n");
+	codeDrawable->Texts->Append("    } else if (0 == end - start) return;\n");
+	codeDrawable->Texts->Append("    else {\n");
+	codeDrawable->Texts->Append("        merge_sort(data, start, (end - start + 1) / 2 + start, result);\n");
+	codeDrawable->Texts->Append("        merge_sort(data, (end - start + 1) / 2 + start + 1, end, result);\n");
+	codeDrawable->Texts->Append("        merge(data, start, end, result);\n");
+	codeDrawable->Texts->Append("        for (int i = start; i <= end; ++i)\n            data[i] = result[i];    \n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("}\n\n");
+	codeDrawable->Texts->Append("int main() {\n    merge_sort(arr, 0, n - 1, res);\n}\n");
 	codeDrawable->Texts->Append("\n");
 
 	SpeedSlider->Value = 13; //默认滑块速度
 	auto n = (int)Executor->SortVector->Size; //数字总数
-	auto stateList = Executor->SortStates; //获取状态列表
-	AddRecoverStep(ref new Vector<int>()); //一开始加入一个空的步骤
+	auto mainVector = Executor->SortVector; //主向量
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto assistVector = Executor->AssistVector; //辅助向量
+	auto assistState = Executor->AssistStates; //辅助状态
+	auto emptyVector = ref new Vector<int>(); //空向量
+	AddRecoverStep(emptyVector); //一开始加入一个空的步骤
 
-	//for (int gap = n / 2; gap > 0; gap /= 2) {
-	//	for (int i = gap; i < n; ++i) {
-	//		Executor->SortVector->SetAt(n, Executor->SortVector->GetAt(i));
-	//		stateList->SetAt(i, (int)PillarState::Default);
-	//		int j;
-	//		for (j = i; j >= gap; j -= gap) {
-	//			AddCompareStep(j - gap, n, 5, isTemp);
-	//			stateList->SetAt(n, (int)PillarState::Default);
-	//			stateList->SetAt(j - gap, (int)PillarState::Default);
-	//			if (Executor->SortVector->GetAt(n) < Executor->SortVector->GetAt(j - gap))
-	//			{
-	//				Executor->SortVector->SetAt(j, Executor->SortVector->GetAt(j - gap));
-	//				stateList->SetAt(n, (int)PillarState::Default);
-	//				AddSetFromToStep(j - gap, j, 6, isTemp);
-	//				stateList->SetAt(j, (int)PillarState::Default);
-	//			}
-	//			else break;
-	//		}
-	//		Executor->SortVector->SetAt(j, Executor->SortVector->GetAt(n));
-	//		AddSetFromToStep(n, j, 9, isTemp);
-	//		stateList->SetAt(j, (int)PillarState::Default);
-	//	}
-	//}
+	MergeSort(mainVector, 0, n - 1, assistVector); //调用归并排序
 
+	AddAllCompleteStep(0);
 	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 分割
+/// </summary>
+/// <param name="data"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
+/// <param name="result"></param>
+void AlgorithmVisualization::SortAlgoPage::Merge(IVector<int>^ data, int start, int end, IVector<int>^ result)
+{
+	auto n = (int)Executor->SortVector->Size; //数字总数
+
+	int left_length = (end - start + 1) / 2 + 1;//左部分区间的数据元素的个数
+	int left_index = start;
+	int right_index = start + left_length;
+	int result_index = start;
+	bool lastCycle = end - start + 1 == n;
+	while (left_index < start + left_length && right_index < end + 1) {
+		AddCompareStep(0, left_index, 0, right_index, 1);
+		SetToDefault(0, left_index, 0, right_index);
+		if (data->GetAt(left_index) <= data->GetAt(right_index))
+		{
+			result->SetAt(result_index, data->GetAt(left_index));
+			AddSetFromToStep(0, left_index, 1, result_index, 2);
+			SetToDefault(1, result_index, 0, left_index);
+			result_index++;
+			left_index++;
+		}
+		else
+		{
+			result->SetAt(result_index, data->GetAt(right_index));
+			AddSetFromToStep(0, right_index, 1, result_index, 4);
+			SetToDefault(1, result_index, 0, right_index);
+			result_index++;
+			right_index++;
+		}
+		if (lastCycle)
+		{
+			for (int i = 0; i < result_index; ++i)
+			{
+				Executor->AssistStates->SetAt(i, (int)PillarState::Completed);
+			}
+		}
+	}
+	while (left_index < start + left_length)
+	{
+		result->SetAt(result_index, data->GetAt(left_index));
+		AddSetFromToStep(0, left_index, 1, result_index, 6);
+		SetToDefault(1, result_index, 0, left_index);
+		result_index++;
+		left_index++;
+	}
+	while (right_index < end + 1)
+	{
+		result->SetAt(result_index, data->GetAt(right_index));
+		AddSetFromToStep(0, right_index, 1, result_index, 7);
+		SetToDefault(1, result_index, 0, right_index);
+		result_index++;
+		right_index++;
+	}
+}
+
+/// <summary>
+/// 归并排序
+/// </summary>
+/// <param name="data"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
+/// <param name="result"></param>
+void AlgorithmVisualization::SortAlgoPage::MergeSort(IVector<int>^ data, int start, int end, IVector<int>^ result)
+{
+	auto n = (int)Executor->SortVector->Size; //数字总数
+
+	if (end - start == 1) {
+		AddCompareStep(0, start, 0, end, 10);
+		SetToDefault(0, start, 0, end);
+		if (data->GetAt(start) > data->GetAt(end)) {
+			int temp = data->GetAt(start);
+			data->SetAt(start, data->GetAt(end));
+			data->SetAt(end, temp);
+			AddSwapStep(0, start, 0, end, 11);
+			SetToDefault(0, start, 0, end);
+		}
+		return;
+	}
+	else if (0 == end - start)
+		return;
+	else {
+		MergeSort(data, start, (end - start + 1) / 2 + start, result);
+		MergeSort(data, (end - start + 1) / 2 + start + 1, end, result);
+		Merge(data, start, end, result);
+		bool lastCycle = end - start + 1 == n;
+		if (lastCycle)
+		{
+			for (int i = 0; i < n; ++i)
+			{
+				Executor->AssistStates->SetAt(i, (int)PillarState::Completed);
+			}
+		}
+		for (int i = start; i <= end; ++i)
+		{
+			data->SetAt(i, result->GetAt(i));
+			AddSetFromToStep(1, i, 0, i, 18);
+			SetToDefault(0, i, 1, i);
+			if (lastCycle)
+			{
+				Executor->SortStates->SetAt(i, (int)PillarState::Completed);
+				Executor->AssistStates->SetAt(i, (int)PillarState::Completed);
+			}
+		}
+	}
 }
 
 void AlgorithmVisualization::SortAlgoPage::InitQuickSort()
