@@ -130,6 +130,8 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	float width = lastHistogramWidth;
 	float height = defaultHeight; //不使用动态高度
 
+	Introduction->TextHighlighters->Clear(); //清空高亮
+
 	if (tag == L"BubbleSort") {
 		AlgorithmName->Text = L"冒泡排序";
 		Executor = ref new SortExcute(20, width, height, false); //实例化排序可执行 初等排序设置小一点
@@ -1453,7 +1455,7 @@ void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
 	SpeedSlider->Value = 13; //默认滑块速度
 	auto n = (int)Executor->SortVector->Size; //数字总数
 	auto mainVector = Executor->SortVector; //主向量
-	for (int i = 0; i < mainVector->Size; i++)
+	for (unsigned int i = 0; i < mainVector->Size; i++)
 	{
 		mainVector->SetAt(i, mainVector->GetAt(i) % 41);
 	}
@@ -1492,7 +1494,7 @@ void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
 	auto assistVector = Executor->AssistVector;
 	AddEmptyStep(isTemp);
 	
-	for (int index = 0; index < mainVector->Size; ++index)
+	for (unsigned int index = 0; index < mainVector->Size; ++index)
 	{
 		int i = mainVector->GetAt(index);
 		assistVector->SetAt(i, assistVector->GetAt(i) + 1);
@@ -1516,9 +1518,18 @@ void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
 	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
 }
 
+/// <summary>
+/// 初始化桶排序
+/// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitBucketSort()
 {
-	throw ref new Platform::NotImplementedException();
+	InitCountingSort();
+	String^ Text1 = L"时间复杂度：O(n)\n桶排序的工作的原理是将数组分到有限数量的桶子里。每个桶子再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。\n";
+	Introduction->Text = Text1 + L"\n桶排序的可视化较为困难，因此这里采用桶排序的特殊情况单桶排序进行代替。";
+	auto highlighter = ref new TextHighlighter();
+	highlighter->Background = ref new SolidColorBrush(Colors::Yellow);
+	highlighter->Ranges->Append(TextRange{ (int)Text1->Length(), (int)Introduction->Text->Length() });
+	Introduction->TextHighlighters->Append(highlighter);
 }
 
 /// <summary>
@@ -1526,7 +1537,7 @@ void AlgorithmVisualization::SortAlgoPage::InitBucketSort()
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitRadixSort()
 {
-	Introduction->Text = L"时间复杂度：O(n)\n";
+	Introduction->Text = L"时间复杂度：O(nmlog₂r)\n基数排序属于“分配式排序”，又称“桶子法”，顾名思义，它是透过键值的部份资讯，将要排序的元素分配至某些“桶”中，藉以达到排序的作用，基数排序法是属于稳定性的排序\n";
 
 	auto codeDrawable = Executor->CodeDrawable;
 	codeDrawable->Texts->Clear();

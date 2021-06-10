@@ -289,8 +289,8 @@ AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color
 
 	bottomTextBlock = ref new TextBlock(); //创建文本
 	bottomTextBlock->Width = width - margin * 2; //设置宽度
-	bottomTextBlock->Height = textHeight; //设置高度
-	bottomTextBlock->Text = number.ToString(); //写入文本
+	bottomTextBlock->Text = number >= 10 ? number.ToString() : L"0" + number.ToString(); //写入文本
+	bottomTextBlock->TextWrapping = TextWrapping::Wrap;
 	bottomTextBlock->HorizontalAlignment = HorizontalAlignment::Center; //设置对齐
 	bottomTextBlock->TextAlignment = TextAlignment::Center; //设置文本对齐
 

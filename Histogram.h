@@ -33,11 +33,11 @@ namespace AlgorithmVisualization {
 		void resize(int _width, int _height); //重新设置尺寸
 
 		property int number; //代表的数字
+		property Windows::UI::Xaml::Controls::TextBlock^ bottomTextBlock; //柱体中的文字
 		
 	private:
 		Windows::UI::Xaml::Controls::StackPanel^ outBox;//最外侧的盒子
 		Windows::UI::Xaml::Shapes::Rectangle^ rect; //柱体中的矩形
-		Windows::UI::Xaml::Controls::TextBlock^ bottomTextBlock; //柱体中的文字
 		Windows::UI::Xaml::Controls::TextBlock^ topTextBlock; //柱体中的文字
 		
 		const int margin = 4; //边界
@@ -70,8 +70,8 @@ namespace AlgorithmVisualization {
 		int maxNumber = 0;
 		Vector<Pillar^>^ pillars; //柱体向量
 
-		float width{1000.0};
-		float height{500.0};
+		float width{ 1000.0 };
+		float height{ 500.0 };
 		
 		Color DefaultColor = Colors::Blue; //默认颜色
 		Color SwappingColor = Colors::Red; //正在交换颜色
