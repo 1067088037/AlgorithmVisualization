@@ -83,8 +83,9 @@ void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<Pill
 		auto rect = ref new Rectangle(); //创建矩形
 		int pillarHeight = (int)(height * number / maxNumber); //计算高度
 		unsigned int n = -1;
+		bool temp = isTemp->IndexOf(i, &n);
 		auto pillar = ref new Pillar{ number, pillarWidth, pillarHeight,
-			stateToColor(states->GetAt(i)), isTemp->IndexOf(i, &n) }; //实例化柱体，设置合理的高度和宽度
+			stateToColor(states->GetAt(i)), temp }; //实例化柱体，设置合理的高度和宽度
 		container->Children->Append(pillar->getView()); //追加进容器
 		pillars->Append(pillar); //追加到向量末尾
 	}

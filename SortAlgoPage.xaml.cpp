@@ -181,7 +181,7 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	else if (tag == L"CountingSort")
 	{
 		AlgorithmName->Text = "计数排序";
-		Executor = ref new SortExcute(32, width, height, false); //实例化排序可执行 初等排序设置小一点
+		Executor = ref new SortExcute(32, width, height, true); //实例化排序可执行 初等排序设置小一点
 		InitExecutor();
 		InitCountingSort();
 	}
@@ -1337,7 +1337,7 @@ void AlgorithmVisualization::SortAlgoPage::QuickSort(IVector<int>^ arr, int left
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitHeapSort()
 {
-	Introduction->Text = L"时间复杂度：O(nlog₂n)\n";
+	Introduction->Text = L"时间复杂度：O(nlog₂n)\n堆排序是指利用堆这种数据结构所设计的一种排序算法。堆积是一个近似完全二叉树的结构，并同时满足堆积的性质：即子结点的键值或索引总是小于（或者大于）它的父节点。堆排序可以说是一种利用堆的概念来排序的选择排序。";
 
 	auto codeDrawable = Executor->CodeDrawable;
 	codeDrawable->Texts->Clear();
@@ -1426,9 +1426,94 @@ void AlgorithmVisualization::SortAlgoPage::HeapSort(IVector<int>^ arr)
 	}
 }
 
+/// <summary>
+/// 初始化计数排序
+/// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(n)\n计数排序是一个非基于比较的排序算法，该算法于1954年由 Harold H. Seward 提出。它的优势在于在对一定范围内的整数排序时，它的复杂度为Ο(n+k)（其中k是整数的范围），快于任何比较排序算法。";
+
+	auto codeDrawable = Executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("int max = arr[0];\n");
+	codeDrawable->Texts->Append("for (int i = 1; i < n; ++i) {\n");
+	codeDrawable->Texts->Append("    if (arr[i] > max)\n");
+	codeDrawable->Texts->Append("        max = arr[i];\n");
+	codeDrawable->Texts->Append("}\n");
+	codeDrawable->Texts->Append("int *countData = new int[max + 1];\n");
+	codeDrawable->Texts->Append("for (int i = 0; i <= max; ++i)\n        countData[i] = 0;\n");
+	codeDrawable->Texts->Append("for (int i : arr)    \n        ++countData[i];    \n");
+	codeDrawable->Texts->Append("int index = 0;\n");
+	codeDrawable->Texts->Append("for (int i = 0; i <= max; ++i) {\n");
+	codeDrawable->Texts->Append("    for (int j = 0; j < countData[i]; ++j) {    \n");
+	codeDrawable->Texts->Append("        arr[index++] = i;    \n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector; //主向量
+	for (int i = 0; i < mainVector->Size; i++)
+	{
+		mainVector->SetAt(i, mainVector->GetAt(i) % 41);
+	}
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto emptyVector = ref new Vector<int>(); //空向量
+	Executor->AssistVector->Clear();
+	AddRecoverStep(emptyVector); //一开始加入一个空的步骤
+
+	Executor->SortVector->Append(0); //临时变量
+	mainState->Append((int)PillarState::Default); //临时变量
+	auto isTemp = ref new Vector<int>{ n };
+	AddEmptyStep(isTemp);
+
+	mainVector->SetAt(n, mainVector->GetAt(0));
+	AddSetFromToStep(0, 0, 0, n, 0, isTemp);
+	SetToDefault(0, 0, 0, n);
+	for (int i = 1; i < n; ++i) {
+		AddCompareStep(0, i, 0, n, 2, isTemp);
+		SetToDefault(0, i, 0, n);
+		if (mainVector->GetAt(i) > mainVector->GetAt(n))
+		{
+			mainVector->SetAt(n, mainVector->GetAt(i));
+			AddSetFromToStep(0, i, 0, n, 3, isTemp);
+			SetToDefault(0, i, 0, n);
+		}
+	}
+	int max = mainVector->GetAt(n);
+
+	//移除临时变量
+	Executor->SortVector->RemoveAtEnd();
+	mainState->RemoveAtEnd();
+	AddEmptyStep(isTemp);
+	
+	Executor->AssistVector = ref new Vector<int>(max + 1, 0);
+	Executor->AssistStates = ref new Vector<int>(max + 1);
+	auto assistVector = Executor->AssistVector;
+	AddEmptyStep(isTemp);
+	
+	for (int index = 0; index < mainVector->Size; ++index)
+	{
+		int i = mainVector->GetAt(index);
+		assistVector->SetAt(i, assistVector->GetAt(i) + 1);
+		AddSetFromToStep(0, index, 1, i, 7);
+		SetToDefault(0, index, 1, i);
+	}
+	int index = 0;
+	for (int i = 0; i <= max; ++i) {
+		for (int j = 0; j < assistVector->GetAt(i); ++j) {
+			mainVector->SetAt(index, i);
+			AddSetFromToStep(1, i, 0, index, 11);
+			SetToDefault(1, i, 1, i);
+			mainState->SetAt(index, (int)PillarState::Completed);
+			index++;
+		}
+	}
+
+	AddAllCompleteStep(0);
+
+	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
 }
 
 void AlgorithmVisualization::SortAlgoPage::InitBucketSort()
