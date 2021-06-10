@@ -188,14 +188,14 @@ void AlgorithmVisualization::SortAlgoPage::InitAlgorithm(String^ tag)
 	else if (tag == L"BucketSort")
 	{
 		AlgorithmName->Text = "桶排序";
-		Executor = ref new SortExcute(32, width, height, false); //实例化排序可执行 初等排序设置小一点
+		Executor = ref new SortExcute(32, width, height, true); //实例化排序可执行 初等排序设置小一点
 		InitExecutor();
 		InitBucketSort();
 	}
 	else if (tag == L"RadixSort")
 	{
 		AlgorithmName->Text = "基数排序";
-		Executor = ref new SortExcute(32, width, height, false); //实例化排序可执行 初等排序设置小一点
+		Executor = ref new SortExcute(32, width, height, true); //实例化排序可执行 初等排序设置小一点
 		InitExecutor();
 		InitRadixSort();
 	}
@@ -1521,9 +1521,162 @@ void AlgorithmVisualization::SortAlgoPage::InitBucketSort()
 	throw ref new Platform::NotImplementedException();
 }
 
+/// <summary>
+/// 初始化基数排序
+/// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitRadixSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(n)\n";
+
+	auto codeDrawable = Executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("int maxbit(const int data[]) {\n    int d = 1;\n    int p = 10;\n");
+	codeDrawable->Texts->Append("    for (int i = 0; i < n; ++i) {\n");
+	codeDrawable->Texts->Append("        while (data[i] >= p) {    \n            p *= 10;    \n            ++d;    \n        }    \n");
+	codeDrawable->Texts->Append("    }\n    return d;\n}\n\n");
+	codeDrawable->Texts->Append("void radixsort(int data[]) {\n    int d = maxbit(data);\n    int tmp[n];\n    int count[10];\n    int i, j, k;\n    int radix = 1;\n    for (i = 1; i <= d; i++) {\n");
+	codeDrawable->Texts->Append("        for (j = 0; j < 10; j++)\n            count[j] = 0;\n");
+	codeDrawable->Texts->Append("        for (j = 0; j < n; j++) {    \n            k = (data[j] / radix) % 10;    \n            count[k]++;    \n        }\n");
+	codeDrawable->Texts->Append("        for (j = 1; j < 10; j++)    \n            count[j] = count[j - 1] + count[j];    \n");
+	codeDrawable->Texts->Append("        for (j = n - 1; j >= 0; j--) {\n            k = (data[j] / radix) % 10;\n");
+	codeDrawable->Texts->Append("            tmp[count[k] - 1] = data[j];    \n");
+	codeDrawable->Texts->Append("            count[k]--;    \n");
+	codeDrawable->Texts->Append("        }\n");
+	codeDrawable->Texts->Append("        for (j = 0; j < n; j++)    \n            data[j] = tmp[j];    \n");
+	codeDrawable->Texts->Append("        radix = radix * 10;\n    }\n}\n\n");
+	codeDrawable->Texts->Append("int main() {\n    radixsort(arr);\n}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector; //主向量
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto emptyVector = ref new Vector<int>(); //空向量
+	AddRecoverStep(emptyVector); //一开始加入一个空的步骤
+
+	auto isTemp = ref new Vector<int>();
+	for (int i = 0; i < 10; ++i) isTemp->Append(n + i);
+
+	RadixSort(mainVector);
+
+	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 计算最大位数
+/// </summary>
+/// <param name="data"></param>
+/// <returns></returns>
+int AlgorithmVisualization::SortAlgoPage::Maxbit(IVector<int>^ data)
+{
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector;
+	auto mainState = Executor->SortStates; //获取状态列表
+	Executor->SortVector->Append(1); //临时变量
+	mainState->Append((int)PillarState::Default); //临时变量
+	Executor->SortVector->Append(10); //临时变量
+	mainState->Append((int)PillarState::Default); //临时变量
+
+	auto isTemp = ref new Vector<int>{ n, n + 1 };;
+	AddEmptyStep(isTemp);
+
+	for (int i = 0; i < n; ++i) {
+		AddCompareStep(i, n + 1, 1, isTemp);
+		SetToDefault(0, i, 0, i);
+		while (data->GetAt(i) >= mainVector->GetAt(n + 1)) {
+			mainVector->SetAt(n + 1, mainVector->GetAt(n + 1) * 10);
+			mainVector->SetAt(n, mainVector->GetAt(n) + 1);
+		}
+	}
+	SetToDefault(0, n, 0, n + 1);
+	int d = mainVector->GetAt(n);
+
+	Executor->SortVector->RemoveAtEnd();
+	mainState->RemoveAtEnd();
+	Executor->SortVector->RemoveAtEnd();
+	mainState->RemoveAtEnd();
+	AddEmptyStep(isTemp);
+
+	return d;
+}
+
+/// <summary>
+/// 基数排序
+/// </summary>
+/// <param name="data"></param>
+void AlgorithmVisualization::SortAlgoPage::RadixSort(IVector<int>^ data)
+{
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector;
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto assistVector = Executor->AssistVector;
+	int d = Maxbit(data);
+
+	//添加临时变量
+	auto isTemp = ref new Vector<int>();
+	for (int i = 0; i < 10; ++i)
+	{
+		Executor->SortVector->Append(0); //临时变量
+		mainState->Append((int)PillarState::Default); //临时变量
+		isTemp->Append(n + i);
+	}
+	AddEmptyStep(isTemp);
+
+	int i, j, k;
+	int radix = 1;
+	for (i = 1; i <= d; i++) {
+		for (j = 0; j < 10; j++)
+		{
+			AddSetStep(n + j, 5, isTemp);
+			mainVector->SetAt(n + j, 0);
+		}
+		for (j = 0; j < n; j++) {
+			k = (data->GetAt(j) / radix) % 10;
+			mainVector->SetAt(n + k, mainVector->GetAt(n + k) + 1);
+			AddSetFromToStep(0, n + k, 0, n + k, 6, isTemp);
+			SetToDefault(0, n + k, 0, n + k);
+		}
+		for (j = 1; j < 10; j++)
+		{
+			mainVector->SetAt(n + j, mainVector->GetAt(n + j - 1) + mainVector->GetAt(n + j));
+			AddSetFromToStep(0, n + j - 1, 0, n + j, 7, isTemp);
+			SetToDefault(0, n + j - 1, 0, n + j);
+		}
+		for (j = n - 1; j >= 0; j--) {
+			k = (data->GetAt(j) / radix) % 10;
+			assistVector->SetAt(mainVector->GetAt(n + k) - 1, mainVector->GetAt(j));
+			AddSetFromToStep(0, j, 1, mainVector->GetAt(n + k) - 1, 9, isTemp);
+			SetToDefault(0, j, 1, mainVector->GetAt(n + k) - 1);
+			if (i == d) Executor->AssistStates->SetAt(mainVector->GetAt(n + k) - 1, (int)PillarState::Completed);
+			mainVector->SetAt(n + k, mainVector->GetAt(n + k) - 1);
+			AddSetFromToStep(0, n + k, 0, n + k, 10, isTemp);
+			SetToDefault(0, n + k, 0, n + k);
+		}
+		if (i == d)
+		{
+			//移除临时变量
+			for (int i = 0; i < 10; ++i)
+			{
+				Executor->SortVector->RemoveAtEnd();
+				mainState->RemoveAtEnd();
+			}
+			AddEmptyStep(isTemp);
+		}
+		for (j = 0; j < n; j++)
+		{
+			mainVector->SetAt(j, assistVector->GetAt(j));
+			AddSetFromToStep(1, j, 0, j, 12, isTemp);
+			SetToDefault(1, j, 0, j);
+			if (i == d)
+			{
+				mainState->SetAt(j, (int)PillarState::Completed);
+				Executor->AssistStates->SetAt(j, (int)PillarState::Completed);
+			}
+		}
+		radix = radix * 10;
+	}
+
+	AddEmptyStep(isTemp);
 }
 
 /// <summary>

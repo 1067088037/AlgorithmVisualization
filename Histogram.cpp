@@ -281,9 +281,9 @@ AlgorithmVisualization::Pillar::Pillar(int _number, int width, int height, Color
 
 	topTextBlock = ref new TextBlock(); //创建文本
 	topTextBlock->Width = width - margin * 2; //设置宽度
-	topTextBlock->Height = textHeight; //设置高度
 	if (temp) topTextBlock->Text = L"临时"; //写入文本
 	else topTextBlock->Text = L""; //写入文字
+	topTextBlock->TextWrapping = TextWrapping::Wrap; //环绕方式
 	topTextBlock->HorizontalAlignment = HorizontalAlignment::Center; //设置对齐
 	topTextBlock->TextAlignment = TextAlignment::Center; //设置文本对齐
 

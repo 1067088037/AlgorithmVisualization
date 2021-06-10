@@ -102,6 +102,8 @@ namespace AlgorithmVisualization
 		void InitCountingSort(); //初始化计数排序
 		void InitBucketSort(); //初始化桶排序
 		void InitRadixSort(); //初始化基数排序
+		int Maxbit(IVector<int>^ data); //最大位数
+		void RadixSort(IVector<int>^ data); //基数排序
 		
 		void Previous_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
