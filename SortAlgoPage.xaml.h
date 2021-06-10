@@ -27,11 +27,14 @@ namespace AlgorithmVisualization
 		virtual SingleStep^ NavigateToNext() override; //导航到下一步
 		virtual SingleStep^ NavigateToPrevious() override; //导航到上一步
 
-		SortExcute(int n, float width, float height); //构造函数
+		SortExcute(int n, float width, float height, bool needAssist = true); //构造函数
 		void ShowCodeChange(IVector<int>^ highlighters); //展示代码的改变
 
-		property Histogram^ histogram; //柱状图
-		property IVector<int>^ sortVector; //要排序的向量
+		property Histogram^ MainHistogram; //柱状图
+		property Histogram^ AssistHistogram; //辅助柱状图
+		property bool NeedAssistHistogram; //是否需要辅助柱状图
+		property IVector<int>^ SortVector; //要排序的向量
+		property IVector<int>^ AssistVector; //辅助向量
 		property TextBlock^ ProcessText; //过程文本
 		property Slider^ ProgressSlider; //过程滑块
 		property TextBlock^ SpeedText; //速度文本
@@ -49,7 +52,7 @@ namespace AlgorithmVisualization
 	public:
 		SortAlgoPage();
 	private:
-		SortExcute^ executor; //算法执行器
+		SortExcute^ Executor; //算法执行器
 		int AlgorithmType = -1; //排序算法类型
 		const float defaultHeight = 410.0; //默认高度
 		float lastHistogramWidth = 980.0; //上次柱状图宽度
@@ -57,6 +60,7 @@ namespace AlgorithmVisualization
 
 		void InitAlgorithm(String^ tag); //初始化算法
 		void InitNavViewItems(int sortAlgorithmType); //初始化导航栏
+		void InitExecutor(); //初始化执行器
 		void Debug(String^ message); //显示调试信息
 		void StartThreadTimer(); //开始计时器线程
 		bool AddEmptyStep(IVector<int>^ stateList, IVector<int>^ isTemp = ref new Vector<int>()); //添加空步骤
