@@ -70,8 +70,8 @@ namespace AlgorithmVisualization {
 		int maxNumber = 0;
 		Vector<Pillar^>^ pillars; //柱体向量
 
-		float width{};
-		float height{};
+		float width{1000.0};
+		float height{500.0};
 		
 		Color DefaultColor = Colors::Blue; //默认颜色
 		Color SwappingColor = Colors::Red; //正在交换颜色

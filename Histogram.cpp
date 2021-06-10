@@ -74,7 +74,7 @@ void AlgorithmVisualization::Histogram::load(IVector<int>^ numbers, IVector<Pill
 	container->Children->Clear(); //先清空原有的容器
 	pillars->Clear();
 	float64 margin = 4.0; //边界大小
-	int _maxNumber = findMax(numbers); //找到最高的，以它为基准作图
+	int _maxNumber = max(1, findMax(numbers)); //找到最高的，以它为基准作图
 	maxNumber = _maxNumber;
 	int pillarWidth = (int)(width / numbers->Size); //计算宽度
 	for (unsigned int i = 0; i < numbers->Size; ++i)
