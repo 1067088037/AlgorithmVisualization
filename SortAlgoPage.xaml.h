@@ -70,6 +70,7 @@ namespace AlgorithmVisualization
 		void StartThreadTimer(); //开始计时器线程
 
 		void InitAssistStep(SingleStep^ step); //初始化辅助步骤
+		void SwapInVector(IVector<int>^ arr, int left, int right); //交换向量中数字
 		bool AddEmptyStep(IVector<int>^ isTemp = ref new Vector<int>()); //添加空步骤
 		bool AddSetStep(int pos, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加设置步骤
 		bool AddSetFromToStep(int from, int to, int highlightLine, IVector<int>^ isTemp = ref new Vector<int>()); //添加有来源的步骤
@@ -93,7 +94,11 @@ namespace AlgorithmVisualization
 		void Merge(IVector<int>^ data, int start, int end, IVector<int>^ result); //分割
 		void MergeSort(IVector<int>^ data, int start, int end, IVector<int>^ result); //归并排序
 		void InitQuickSort(); //初始化快速排序
+		int Partition(IVector<int>^ arr, int left, int right); //分割
+		void QuickSort(IVector<int>^ arr, int left, int right); //快速排序
 		void InitHeapSort(); //初始化堆排序
+		void MaxHeapify(IVector<int>^ arr, int start, int end); //最大堆化
+		void HeapSort(IVector<int>^ arr); //堆排序
 		void InitCountingSort(); //初始化计数排序
 		void InitBucketSort(); //初始化桶排序
 		void InitRadixSort(); //初始化基数排序

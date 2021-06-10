@@ -498,6 +498,19 @@ void AlgorithmVisualization::SortAlgoPage::InitAssistStep(SingleStep^ step)
 }
 
 /// <summary>
+/// 交换向量中数字
+/// </summary>
+/// <param name="arr"></param>
+/// <param name="left"></param>
+/// <param name="right"></param>
+void AlgorithmVisualization::SortAlgoPage::SwapInVector(IVector<int>^ arr, int left, int right)
+{
+	int temp = arr->GetAt(left);
+	arr->SetAt(left, arr->GetAt(right));
+	arr->SetAt(right, temp);
+}
+
+/// <summary>
 /// 添加空步骤
 /// </summary>
 /// <param name="isTemp"></param>
@@ -949,7 +962,7 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 		}
 	}
 
-	AddAllCompleteStep(stateList); //最后全部完成
+	AddAllCompleteStep(); //最后全部完成
 	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
 	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
 }
@@ -959,7 +972,7 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 {
-	Introduction->Text = L"时间复杂度：O(n²)\n希尔排序是直接插入排序算法的一种更高效的改进版本，是非稳定排序算法。希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至 1 时，整个文件恰被分成一组，算法便终止。";
+	Introduction->Text = L"时间复杂度：O(n^(1.3~2))\n希尔排序是直接插入排序算法的一种更高效的改进版本，是非稳定排序算法。希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至 1 时，整个文件恰被分成一组，算法便终止。";
 
 	auto codeDrawable = Executor->CodeDrawable;
 	codeDrawable->Texts->Clear();
@@ -1032,7 +1045,7 @@ void AlgorithmVisualization::SortAlgoPage::InitShellSort()
 /// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitMergeSort()
 {
-	Introduction->Text = L"时间复杂度：O(n²)\n归并排序是建立在归并操作上的一种有效，稳定的排序算法，该算法是采用分治法的一个非常典型的应用。将已有序的子序列合并，得到完全有序的序列；即先使每个子序列有序，再使子序列段间有序。若将两个有序表合并成一个有序表，称为二路归并。";
+	Introduction->Text = L"时间复杂度：O(nlog₂n)\n归并排序是建立在归并操作上的一种有效，稳定的排序算法，该算法是采用分治法的一个非常典型的应用。将已有序的子序列合并，得到完全有序的序列；即先使每个子序列有序，再使子序列段间有序。若将两个有序表合并成一个有序表，称为二路归并。";
 
 	auto codeDrawable = Executor->CodeDrawable;
 	codeDrawable->Texts->Clear();
@@ -1188,14 +1201,229 @@ void AlgorithmVisualization::SortAlgoPage::MergeSort(IVector<int>^ data, int sta
 	}
 }
 
+/// <summary>
+/// 初始化快速排序
+/// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitQuickSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(nlog₂n)\n通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列。";
+
+	auto codeDrawable = Executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("int partition(int arr[], int left, int right) {\n");
+	codeDrawable->Texts->Append("    int i = left + 1;\n    int j = right;\n    int temp = arr[left];    \n");
+	codeDrawable->Texts->Append("    while (i <= j) {\n");
+	codeDrawable->Texts->Append("        while (arr[i] < temp) i++;    \n");
+	codeDrawable->Texts->Append("        while (arr[j] > temp) j--;    \n");
+	codeDrawable->Texts->Append("        if (i < j) {\n");
+	codeDrawable->Texts->Append("            swap(arr[i], arr[j]);    \n            i++;    \n            j--;    \n");
+	codeDrawable->Texts->Append("        } else i++;\n");
+	codeDrawable->Texts->Append("    }\n");
+	codeDrawable->Texts->Append("    swap(arr[j], arr[left]);    \n");
+	codeDrawable->Texts->Append("    return j;\n");
+	codeDrawable->Texts->Append("}\n\n");
+	codeDrawable->Texts->Append("void quick_sort(int arr[], int left, int right) {\n");
+	codeDrawable->Texts->Append("    if (left > right) return;\n");
+	codeDrawable->Texts->Append("    int j = partition(arr, left, right);\n");
+	codeDrawable->Texts->Append("    quick_sort(arr, left, j - 1);\n");
+	codeDrawable->Texts->Append("    quick_sort(arr, j + 1, right);\n");
+	codeDrawable->Texts->Append("}\n\n");
+	codeDrawable->Texts->Append("int main() {\n");
+	codeDrawable->Texts->Append("    quick_sort(arr, 0, n - 1);\n");
+	codeDrawable->Texts->Append("}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector; //主向量
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto emptyVector = ref new Vector<int>(); //空向量
+	AddRecoverStep(emptyVector); //一开始加入一个空的步骤
+
+	Executor->SortVector->Append(0); //临时变量
+	mainState->Append((int)PillarState::Default); //临时变量
+	auto isTemp = ref new Vector<int>{ n };
+	AddEmptyStep(isTemp);
+
+	QuickSort(mainVector, 0, n - 1);
+
+	for (auto& i : mainState)
+	{
+		i = (int)PillarState::Completed;
+	}
+	mainState->SetAt(n, (int)PillarState::Default); //临时变量
+	AddEmptyStep(isTemp);
+
+	//移除临时变量
+	Executor->SortVector->RemoveAtEnd();
+	mainState->RemoveAtEnd();
+	AddEmptyStep(isTemp);
+
+	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
 }
 
+/// <summary>
+/// 分治法
+/// </summary>
+/// <param name="arr"></param>
+/// <param name="left"></param>
+/// <param name="right"></param>
+/// <returns></returns>
+int AlgorithmVisualization::SortAlgoPage::Partition(IVector<int>^ arr, int left, int right)
+{
+	auto n = (int)Executor->SortVector->Size - 1; //数字总数
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto isTemp = ref new Vector<int>{ n };
+
+	int i = left + 1;
+	int j = right;
+	int temp = arr->GetAt(left);
+	arr->SetAt(n, temp);
+	AddSetFromToStep(left, n, 1, isTemp);
+	SetToDefault(0, left, 0, n);
+	while (i <= j) {
+		while (true)
+		{
+			AddCompareStep(i, n, 3, isTemp);
+			SetToDefault(0, i, 0, n);
+			if (arr->GetAt(i) >= temp) break;
+			i++;
+			mainState->SetAt(i, (int)PillarState::Selected);
+		}
+		while (true)
+		{
+			AddCompareStep(j, n, 4, isTemp);
+			SetToDefault(0, j, 0, n);
+			if (arr->GetAt(j) <= temp) break;
+			j--;
+			mainState->SetAt(j, (int)PillarState::Selected);
+		}
+		if (i < j)
+		{
+			int tmp1 = arr->GetAt(i);
+			arr->SetAt(i, arr->GetAt(j));
+			arr->SetAt(j, tmp1);
+			AddSwapStep(i, j, 6, isTemp);
+			SetToDefault(0, i, 0, j);
+			i++;
+			j--;
+		}
+		else i++;
+	}
+	int tmp2 = arr->GetAt(left);
+	arr->SetAt(left, arr->GetAt(j));
+	arr->SetAt(j, tmp2);
+	AddSwapStep(left, j, 9, isTemp);
+	SetToDefault(0, left, 0, j);
+	return j;
+}
+
+/// <summary>
+/// 快速排序
+/// </summary>
+/// <param name="arr"></param>
+/// <param name="left"></param>
+/// <param name="right"></param>
+void AlgorithmVisualization::SortAlgoPage::QuickSort(IVector<int>^ arr, int left, int right)
+{
+	if (left > right) return;
+	int j = Partition(arr, left, right);
+	QuickSort(arr, left, j - 1);
+	QuickSort(arr, j + 1, right);
+}
+
+/// <summary>
+/// 初始化堆排序
+/// </summary>
 void AlgorithmVisualization::SortAlgoPage::InitHeapSort()
 {
-	throw ref new Platform::NotImplementedException();
+	Introduction->Text = L"时间复杂度：O(nlog₂n)\n";
+
+	auto codeDrawable = Executor->CodeDrawable;
+	codeDrawable->Texts->Clear();
+	codeDrawable->Texts->Append("void max_heapify(int pInt[], int start, int end) {\n    int dad = start;\n    int son = dad * 2 + 1;\n");
+	codeDrawable->Texts->Append("    while (son <= end) {\n");
+	codeDrawable->Texts->Append("        if (son + 1 <= end && pInt[son] < pInt[son + 1])    \n");
+	codeDrawable->Texts->Append("            son++;\n");
+	codeDrawable->Texts->Append("        if (pInt[dad] > pInt[son]) return;\n");
+	codeDrawable->Texts->Append("        else {\n");
+	codeDrawable->Texts->Append("            swap(pInt[dad], pInt[son]);    \n            dad = son;    \n            son = dad * 2 + 1;    \n");
+	codeDrawable->Texts->Append("        }\n    }\n}\n\n");
+	codeDrawable->Texts->Append("void heap_sort(int pInt[], int len) {\n");
+	codeDrawable->Texts->Append("    for (int i = len / 2 - 1; i >= 0; i--)\n");
+	codeDrawable->Texts->Append("        max_heapify(pInt, i, len - 1);\n");
+	codeDrawable->Texts->Append("    for (int i = len - 1; i > 0; i--) {\n");
+	codeDrawable->Texts->Append("        swap(pInt[0], pInt[i]);    \n");
+	codeDrawable->Texts->Append("        max_heapify(pInt, 0, i - 1);\n");
+	codeDrawable->Texts->Append("    }\n}\n\n");
+	codeDrawable->Texts->Append("int main() {\n");
+	codeDrawable->Texts->Append("    heap_sort(arr, n);\n");
+	codeDrawable->Texts->Append("}\n");
+
+	SpeedSlider->Value = 13; //默认滑块速度
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	auto mainVector = Executor->SortVector; //主向量
+	auto mainState = Executor->SortStates; //获取状态列表
+	auto emptyVector = ref new Vector<int>(); //空向量
+	AddRecoverStep(emptyVector); //一开始加入一个空的步骤
+
+	HeapSort(mainVector);
+
+	AddAllCompleteStep();
+
+	ProcessText->Text = "0/" + (Executor->StepList->Size - 1).ToString(); //在初始化完毕后设置文本
+	ProgressSlider->Maximum = Executor->StepList->Size - 1; //设置进度滑块最大值
+}
+
+/// <summary>
+/// 最大堆化
+/// </summary>
+/// <param name="arr"></param>
+/// <param name="start"></param>
+/// <param name="end"></param>
+void AlgorithmVisualization::SortAlgoPage::MaxHeapify(IVector<int>^ arr, int start, int end)
+{
+	int dad = start;
+	int son = dad * 2 + 1;
+	while (son <= end) {
+
+		if (son + 1 <= end)
+		{
+			AddCompareStep(son, son + 1, 2);
+			SetToDefault(0, son, 0, son + 1);
+			if (arr->GetAt(son) < arr->GetAt(son + 1))
+				son++;
+		}
+		AddCompareStep(dad, son, 4);
+		SetToDefault(0, dad, 0, son);
+		if (arr->GetAt(dad) > arr->GetAt(son))
+			return;
+		else {
+			SwapInVector(arr, dad, son);
+			AddSwapStep(dad, son, 6);
+			SetToDefault(0, dad, 0, son);
+			dad = son;
+			son = dad * 2 + 1;
+		}
+	}
+}
+
+/// <summary>
+/// 堆排序
+/// </summary>
+/// <param name="arr"></param>
+void AlgorithmVisualization::SortAlgoPage::HeapSort(IVector<int>^ arr)
+{
+	auto n = (int)Executor->SortVector->Size; //数字总数
+	for (int i = n / 2 - 1; i >= 0; i--)
+		MaxHeapify(arr, i, n - 1);
+	for (int i = n - 1; i > 0; i--) {
+		SwapInVector(arr, 0, i);
+		AddSwapStep(0, i, 12);
+		SetToDefault(0, 0, 0, i);
+		MaxHeapify(arr, 0, i - 1);
+		Executor->SortStates->SetAt(i, (int)PillarState::Completed);
+	}
 }
 
 void AlgorithmVisualization::SortAlgoPage::InitCountingSort()
