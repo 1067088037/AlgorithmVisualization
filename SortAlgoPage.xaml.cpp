@@ -1331,7 +1331,7 @@ void AlgorithmVisualization::SortAlgoPage::QuickSort(IVector<int>^ arr, int left
 	if (left > right) return;
 	int j = Partition(arr, left, right);
 	QuickSort(arr, left, j - 1);
-	for (unsigned int i = 0; i < j; i++)
+	for (int i = 0; i < j; i++)
 	{
 		Executor->SortStates->SetAt(i, (int)PillarState::Completed);
 	}

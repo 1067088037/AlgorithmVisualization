@@ -9,6 +9,10 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <TextBlock FontSize="48" Padding="12">主页</TextBlock>
+        <StackPanel>
+            <TextBlock FontSize="48" Margin="12">算法可视化</TextBlock>
+            <TextBlock FontSize="18" Margin="12" TextWrapping="Wrap">将抽象的算法通过易于理解的可视化呈现在学习者的眼前</TextBlock>
+        </StackPanel>
+        <Image Source="Assets/Logo.png" Height="350" Width="350" Stretch="Uniform"></Image>
     </Grid>
 </Page>
