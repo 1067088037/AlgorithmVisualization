@@ -24,7 +24,7 @@
 
                     <StackPanel x:Name="SortHistogramStack" Grid.Row="0" Grid.Column="0" Margin="6">
                         <TextBlock FontSize="24" Margin="6">柱状图</TextBlock>
-                        <Button Content="调试" Click="Debug_Click"></Button>
+                        <!-- <Button Content="调试" Click="Debug_Click"></Button> -->
                         <StackPanel x:Name="SortHistogram" 
                                         Margin="6" 
                                         SizeChanged="SortHistogram_SizeChanged" 
