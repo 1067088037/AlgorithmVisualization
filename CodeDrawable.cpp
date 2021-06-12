@@ -36,7 +36,7 @@ IVector<Object^>^ AlgorithmVisualization::CodeDrawable::GenerateDrawable(IVector
 	auto para = ref new Paragraph();
 	auto highlighter = ref new TextHighlighter();
 	int textCount = 0;
-	for (int i = 0; i < Texts->Size; ++i)
+	for (unsigned int i = 0; i < Texts->Size; ++i)
 	{
 		unsigned int n;
 		highLightLine->IndexOf(i, &n);

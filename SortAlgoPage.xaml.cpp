@@ -951,11 +951,11 @@ void AlgorithmVisualization::SortAlgoPage::InitInsertionSort()
 			stateList->SetAt(j - 1, (int)PillarState::Default);
 			if (Executor->SortVector->GetAt(j) < Executor->SortVector->GetAt(j - 1)) //比较
 			{
-				AddSwapStep(j - 1, j, 3); //添加交换步骤
 				//交换数据
 				int temp = Executor->SortVector->GetAt(j);
 				Executor->SortVector->SetAt(j, Executor->SortVector->GetAt(j - 1));
 				Executor->SortVector->SetAt(j - 1, temp);
+				AddSwapStep(j - 1, j, 3); //添加交换步骤
 			}
 			else break;
 			//恢复默认状态
@@ -1648,8 +1648,8 @@ void AlgorithmVisualization::SortAlgoPage::RadixSort(IVector<int>^ data)
 		for (j = 0; j < n; j++) {
 			k = (data->GetAt(j) / radix) % 10;
 			mainVector->SetAt(n + k, mainVector->GetAt(n + k) + 1);
-			AddSetFromToStep(0, n + k, 0, n + k, 6, isTemp);
-			SetToDefault(0, n + k, 0, n + k);
+			AddSetFromToStep(0, j, 0, n + k, 6, isTemp);
+			SetToDefault(0, j, 0, n + k);
 		}
 		for (j = 1; j < 10; j++)
 		{
