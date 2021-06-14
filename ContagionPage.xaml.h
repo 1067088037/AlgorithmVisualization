@@ -81,12 +81,14 @@ namespace AlgorithmVisualization
 		bool IsTimerRunning(); //计时器是否在运行
 		void StartTimer(); //启动计时器
 		void StopTimer(); //停止计时器
-		
+
+		ContagionModelType currentType;
 		double lastGridWidth = 800.0; //上次柱状图宽度
 		double lastGridHeight = 400.0; //上次柱状图高度
 		int64 Speed = 200; //可视化速度
 		int ContactPeopleCount = 20; //接触到的人数
 		double InfectiousRate = 0.1; //感染率
+		double RecoveryRate = 0.1; //康复率
 
 		Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 		Grid^ InfectiousGrid; //传染病网格
@@ -115,5 +117,7 @@ namespace AlgorithmVisualization
 		std::default_random_engine e{ GetTickCount() }; //随机数引擎
 		std::uniform_real_distribution<double> random{ 0, 1 };
 		
+		void RecoveryRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
+		void Reset_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 	};
 }

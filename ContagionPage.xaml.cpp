@@ -35,13 +35,7 @@ ContagionPage::ContagionPage()
 	srand(GetTickCount());
 	InitializeComponent();
 	ContagionModelType type = (ContagionModelType)((App^)(Application::Current))->contagionAlgorithmType; //传染病模型类型
-
-	int rows = 30;
-	int cols = 60;
-	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows, 
-		rows, cols, RectState::Susceptible);
-	ContagionGrid->Children->Append(InfectiousGrid->GetView());
-
+	currentType = type;
 	InitAlgorithm(type);
 }
 
@@ -74,6 +68,17 @@ void AlgorithmVisualization::ContagionPage::DebugBtn_Click(Platform::Object^ sen
 /// <param name="type"></param>
 void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType type)
 {
+	StopTimer();
+	Next->IsEnabled = true;
+	StartOrPause->Content = L"开始";
+
+	ContagionGrid->Children->Clear();
+	int rows = 30;
+	int cols = 60;
+	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows,
+		rows, cols, RectState::Susceptible);
+	ContagionGrid->Children->Append(InfectiousGrid->GetView());
+	
 	InfectiousGrid->GetCenter()->ChangeState(RectState::Infectious);
 	GetThisState();
 	
@@ -144,8 +149,10 @@ void AlgorithmVisualization::ContagionPage::LoadNextState()
 void AlgorithmVisualization::ContagionPage::InitSIModel()
 {
 	NavToNextStep = &ContagionPage::SINextStep;
-	Introduction->Text = L"SI传播模型是最简单的疾病传播模型，模型中的所有个体都只可能处于两个状态中的一个：即易感(S)状态或感染(I)状态。\nSI模型中的个体一旦被感染后就永远处于感染状态。";
+	Introduction->Text = L"SI传播模型是最简单的疾病传播模型，模型中的所有个体都只可能处于两个状态中的一个：即易感(S)状态或感染(I)状态。SI模型中的个体一旦被感染后就永远处于感染状态。";
 	FitInfectiousDisease->Text = L"适用于：艾滋病";
+
+	RecoveryRateBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -154,7 +161,8 @@ void AlgorithmVisualization::ContagionPage::InitSIModel()
 void AlgorithmVisualization::ContagionPage::InitSISModel()
 {
 	NavToNextStep = &ContagionPage::SISNextStep;
-	
+	Introduction->Text = L"SIS传播模型在SI模型基础上加入康复的概率，即治愈率。该模型适用于只有易感者和患病者两类人群，但会反复发作的疾病。易感者与患病者有效接触即被感染，变为患病者，可被治愈再次变为易感者，无潜伏期、无免疫力。";
+	FitInfectiousDisease->Text = L"适用于：细菌性痢疾";
 }
 
 /// <summary>
@@ -193,7 +201,7 @@ void AlgorithmVisualization::ContagionPage::SINextStep()
 	{
 		for (int j = 0; j < yMax; j++)
 		{
-			if (GetState(i, j, false) == RectState::Infectious)
+			if (GetState(i, j, false) == RectState::Infectious) //如果感染则可以传染给别人
 				InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate);
 		}
 	}	
@@ -204,7 +212,23 @@ void AlgorithmVisualization::ContagionPage::SINextStep()
 /// </summary>
 void AlgorithmVisualization::ContagionPage::SISNextStep()
 {
-
+	for (int i = 0; i < xMax; i++)
+	{
+		for (int j = 0; j < yMax; j++)
+		{
+			if (GetState(i, j, false) == RectState::Infectious)
+			{
+				if (random(e) <= RecoveryRate)
+				{
+					SetState(i, j, RectState::Susceptible, true); //在一定概率下转化为易感者
+				}
+				else
+				{
+					InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate); //如果没有痊愈则继续传染
+				}
+			}
+		}
+	}
 }
 
 /// <summary>
@@ -413,7 +437,11 @@ void AlgorithmVisualization::ContagionPage::InfectiousRateSlider_ValueChanged(Pl
 	InfectiousRate = e->NewValue / 100;
 }
 
-
+/// <summary>
+/// 开始和暂停按钮
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
 void AlgorithmVisualization::ContagionPage::StartOrPause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	if (IsTimerRunning())
@@ -428,4 +456,25 @@ void AlgorithmVisualization::ContagionPage::StartOrPause_Click(Platform::Object^
 		Next->IsEnabled = false;
 		StartOrPause->Content = L"暂停";
 	}
+}
+
+/// <summary>
+/// 恢复率改变时回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::RecoveryRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	RecoveryRateText->Text = (int)e->NewValue + L"%";
+	RecoveryRate = e->NewValue / 100;
+}
+
+/// <summary>
+/// 重置
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::Reset_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	InitAlgorithm(currentType);
 }

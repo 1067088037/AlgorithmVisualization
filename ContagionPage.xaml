@@ -57,9 +57,10 @@
             <TextBlock x:Name="FitInfectiousDisease" Margin="6" TextWrapping="Wrap">适用于：艾滋病</TextBlock>
             <StackPanel Margin="6" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="StartOrPause" Click="StartOrPause_Click">开始</Button>
+                <Button x:Name="Reset" Margin="20 0 0 0" Click="Reset_Click">重置</Button>
                 <Button x:Name="Next" Margin="20 0 0 0" Click="Next_Click">下一步</Button>
             </StackPanel>
-            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+            <Border x:Name="TimeElapseSpeedBox" BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="4" FontSize="18">时间流逝速度</TextBlock>
@@ -68,7 +69,7 @@
                     <Slider x:Name="TimeElapseSpeedSlider" Margin="4" Maximum="2.0" Minimum="0.1" Value="0.2" StepFrequency="0.1" ValueChanged="TimeElapseSpeedSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
-            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+            <Border x:Name="ContactPeopleCountBox" BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="4" FontSize="18">感染者每天接触到的人</TextBlock>
@@ -77,16 +78,25 @@
                     <Slider x:Name="ContactPeopleCountSlider" Margin="4" Maximum="80" Minimum="0" Value="20" StepFrequency="10" ValueChanged="ContactPeopleCountSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
-            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+            <Border x:Name="InfectiousRateBox" BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="4" FontSize="18">平均感染率</TextBlock>
-                        <TextBlock x:Name="InfectiousRateText" FontSize="16" VerticalAlignment="Center" Margin="4">10%</TextBlock>
+                        <TextBlock Margin="4" FontSize="18">易感人群感染率</TextBlock>
+                        <TextBlock x:Name="InfectiousRateText" FontSize="16" VerticalAlignment="Center" Margin="4">15%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="InfectiousRateSlider" Margin="4" Maximum="100" Minimum="0" Value="10" StepFrequency="1" ValueChanged="InfectiousRateSlider_ValueChanged"></Slider>
+                    <Slider x:Name="InfectiousRateSlider" Margin="4" Maximum="100" Minimum="0" Value="15" StepFrequency="1" ValueChanged="InfectiousRateSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
-            <!--<Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+            <Border x:Name="RecoveryRateBox" BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="4" FontSize="18">感染者康复率</TextBlock>
+                        <TextBlock x:Name="RecoveryRateText" FontSize="16" VerticalAlignment="Center" Margin="4">10%</TextBlock>
+                    </StackPanel>
+                    <Slider x:Name="RecoveryRateSlider" Margin="4" Maximum="100" Minimum="0" Value="10" StepFrequency="1" ValueChanged="RecoveryRateSlider_ValueChanged"></Slider>
+                </StackPanel>
+            </Border>
+            <!--<Border x:Name="" BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="4" FontSize="18"></TextBlock>
