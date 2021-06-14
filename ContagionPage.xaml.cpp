@@ -171,7 +171,8 @@ void AlgorithmVisualization::ContagionPage::InitSISModel()
 void AlgorithmVisualization::ContagionPage::InitSIRModel()
 {
 	NavToNextStep = &ContagionPage::SIRNextStep;
-
+	Introduction->Text = L"适用于有易感者、患病者和康复者三类人群，治愈后不会再发的疾病。康复者具有很强免疫力，不会被再次感染。对于致死性的传染病也可以使用这个模型，死亡的病人也可以归入康复者。此时的康复者可以理解为退出了传染系统。";
+	FitInfectiousDisease->Text = L"适用于：水痘";
 }
 
 /// <summary>
@@ -236,7 +237,23 @@ void AlgorithmVisualization::ContagionPage::SISNextStep()
 /// </summary>
 void AlgorithmVisualization::ContagionPage::SIRNextStep()
 {
-
+	for (int i = 0; i < xMax; i++)
+	{
+		for (int j = 0; j < yMax; j++)
+		{
+			if (GetState(i, j, false) == RectState::Infectious)
+			{
+				if (random(e) <= RecoveryRate)
+				{
+					SetState(i, j, RectState::Recovered, true); //在一定概率下转化为康复者
+				}
+				else
+				{
+					InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate); //如果没有痊愈则继续传染
+				}
+			}
+		}
+	}
 }
 
 /// <summary>
@@ -317,7 +334,7 @@ void AlgorithmVisualization::ContagionPage::InfectNear(int srcX, int srcY, int c
 	for (unsigned int i = 0; i < nearPeople->Size; ++i)
 	{
 		auto people = nearPeople->GetAt(i);
-		if (random(e) <= probability)
+		if (GetState(people->x, people->y) == RectState::Susceptible && random(e) <= probability)
 		{
 			SetState(people->x, people->y, RectState::Infectious, true);
 		}
