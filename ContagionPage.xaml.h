@@ -21,5 +21,8 @@ namespace AlgorithmVisualization
 		void ContagionGrid_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
 		void Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void DebugBtn_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+
+		double lastGridWidth = 900.0; //上次柱状图宽度
+		double lastGridHeight = 400.0; //上次柱状图高度
 	};
 }

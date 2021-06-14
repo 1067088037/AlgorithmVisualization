@@ -4,6 +4,7 @@
 //
 
 #include "pch.h"
+#include "Grid.h"
 #include "ContagionPage.xaml.h"
 
 using namespace AlgorithmVisualization;
@@ -25,12 +26,16 @@ ContagionPage::ContagionPage()
 {
 	InitializeComponent();
 	int type = ((App^)(Application::Current))->sortAlgorithmType; //传染病模型类型
+
+	//auto grid = ref new Grid(lastGridWidth, lastGridHeight, 30, 30, RectState::Susceptible);
+	//ContagionGrid->Children->Append(grid->GetView());
 }
 
 
 void AlgorithmVisualization::ContagionPage::ContagionGrid_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
-
+	lastGridWidth = e->NewSize.Width;
+	lastGridHeight = e->NewSize.Height;
 }
 
 
