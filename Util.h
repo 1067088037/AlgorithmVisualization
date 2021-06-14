@@ -14,6 +14,9 @@ namespace AlgorithmVisualization {
 	internal:
 		template<class T>
 		static IVector<T>^ CopyVector(IVector<T>^ from);
+
+		template<class T>
+		static IVector<IVector<T>^>^ Copy2DVector(IVector<IVector<T>^>^ from);
 	};
 	
 	template<class T>
@@ -23,6 +26,21 @@ namespace AlgorithmVisualization {
 		for (auto i : from)
 		{
 			To->Append(i);
+		}
+		return To;
+	}
+	template<class T>
+	inline IVector<IVector<T>^>^ Util::Copy2DVector(IVector<IVector<T>^>^ from)
+	{
+		auto To = ref new Vector<IVector<T>^>();
+		for (IVector<T>^ i : from)
+		{
+			auto ToRow = ref new Vector<T>();
+			for (T j : i)
+			{
+				ToRow->Append(j);
+			}
+			To->Append(ToRow);
 		}
 		return To;
 	}

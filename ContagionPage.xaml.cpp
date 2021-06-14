@@ -5,6 +5,8 @@
 
 #include "pch.h"
 #include "Grid.h"
+#include "Util.h"
+#include <random>
 #include "ContagionPage.xaml.h"
 
 using namespace AlgorithmVisualization;
@@ -30,6 +32,7 @@ using namespace Windows::UI::Core;
 /// </summary>
 ContagionPage::ContagionPage()
 {
+	srand(GetTickCount());
 	InitializeComponent();
 	ContagionModelType type = (ContagionModelType)((App^)(Application::Current))->contagionAlgorithmType; //传染病模型类型
 
@@ -72,6 +75,7 @@ void AlgorithmVisualization::ContagionPage::DebugBtn_Click(Platform::Object^ sen
 void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType type)
 {
 	InfectiousGrid->GetCenter()->ChangeState(RectState::Infectious);
+	GetThisState();
 	
 	switch (type)
 	{
@@ -101,12 +105,47 @@ void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType typ
 }
 
 /// <summary>
+/// 获取当前步骤
+/// </summary>
+/// <returns></returns>
+void AlgorithmVisualization::ContagionPage::GetThisState()
+{
+	auto res = ref new Vector<IVector<RectState>^>(InfectiousGrid->cols);
+	for (int i = 0; i < InfectiousGrid->cols; i++)
+	{
+		auto resRow = ref new Vector<RectState>(InfectiousGrid->rows);
+		for (int j = 0; j < InfectiousGrid->rows; j++)
+		{
+			resRow->SetAt(j, InfectiousGrid->Get(i, j)->CurrentState);
+		}
+		res->SetAt(i, resRow);
+	}
+	NextStateVector = res;
+	ThisStateVector = Util::Copy2DVector(res);
+}
+
+/// <summary>
+/// 加载下一步状态
+/// </summary>
+void AlgorithmVisualization::ContagionPage::LoadNextState()
+{
+	for (int i = 0; i < InfectiousGrid->cols; i++)
+	{
+		for (int j = 0; j < InfectiousGrid->rows; j++)
+		{
+			InfectiousGrid->SetState(i, j, NextStateVector->GetAt(i)->GetAt(j));
+		}
+	}
+}
+
+/// <summary>
 /// 初始化SI模型
 /// </summary>
 void AlgorithmVisualization::ContagionPage::InitSIModel()
 {
 	NavToNextStep = &ContagionPage::SINextStep;
-	
+	Introduction->Text = L"SI传播模型是最简单的疾病传播模型，模型中的所有个体都只可能处于两个状态中的一个：即易感(S)状态或感染(I)状态。\nSI模型中的个体一旦被感染后就永远处于感染状态。";
+	FitInfectiousDisease->Text = L"适用于：艾滋病";
 }
 
 /// <summary>
@@ -150,7 +189,14 @@ void AlgorithmVisualization::ContagionPage::InitSEIARModel()
 /// </summary>
 void AlgorithmVisualization::ContagionPage::SINextStep()
 {
-	
+	for (int i = 0; i < xMax; i++)
+	{
+		for (int j = 0; j < yMax; j++)
+		{
+			if (GetState(i, j, false) == RectState::Infectious)
+				InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate);
+		}
+	}	
 }
 
 /// <summary>
@@ -186,12 +232,123 @@ void AlgorithmVisualization::ContagionPage::SEIARNextStep()
 }
 
 /// <summary>
+/// 获取状态
+/// </summary>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <returns></returns>
+RectState AlgorithmVisualization::ContagionPage::GetState(int x, int y, bool next)
+{
+	if (next)
+		return NextStateVector->GetAt(x)->GetAt(y);
+	else
+		return ThisStateVector->GetAt(x)->GetAt(y);
+}
+
+/// <summary>
+/// 设置状态
+/// </summary>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <param name="newState"></param>
+void AlgorithmVisualization::ContagionPage::SetState(int x, int y, RectState newState, bool next)
+{
+	if (next)
+		NextStateVector->GetAt(x)->SetAt(y, newState);
+	else
+		ThisStateVector->GetAt(x)->SetAt(y, newState);
+}
+
+/// <summary>
+/// 感染临近的人
+/// </summary>
+/// <param name="srcX"></param>
+/// <param name="srcY"></param>
+/// <param name="nearCount"></param>
+/// <param name="probability"></param>
+void AlgorithmVisualization::ContagionPage::InfectNear(int srcX, int srcY, int contactCount, double probability)
+{
+	if (contactCount < 0 || contactCount > 8) 
+		throw ref new InvalidArgumentException(L"临近的人必须是0~8的整数");
+
+	//获取邻近的人的状态
+	auto nearPeople = ref new Vector<Point^>();
+	for (int i = 0; i < 8; i++)
+	{
+		int newX = srcX + DirectionX[i];
+		int newY = srcY + DirectionY[i];
+		if (CheckPointValid(newX, newY))
+		{
+			nearPeople->Append(ref new Point{ newX, newY });
+		}
+	}
+
+	while ((int)nearPeople->Size > contactCount) //当目前的人数大于接触到的人数时
+	{
+		double rand1 = random(e);
+		int removeAt = (int)(rand1 * 100000000) % nearPeople->Size;
+		nearPeople->RemoveAt(removeAt); //随机删除其中一个元素
+	}
+
+	for (unsigned int i = 0; i < nearPeople->Size; ++i)
+	{
+		auto people = nearPeople->GetAt(i);
+		if (random(e) <= probability)
+		{
+			SetState(people->x, people->y, RectState::Infectious, true);
+		}
+	}
+}
+
+/// <summary>
+/// 检查点位的合法性
+/// </summary>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <returns></returns>
+bool AlgorithmVisualization::ContagionPage::CheckPointValid(int x, int y)
+{
+	if (x < 0 || y < 0) return false;
+	if (x >= InfectiousGrid->cols || y >= InfectiousGrid->rows) return false;
+	return true;
+}
+
+/// <summary>
 /// 计时器是否在运行
 /// </summary>
 /// <returns></returns>
 bool AlgorithmVisualization::ContagionPage::IsTimerRunning()
 {
 	return ThreadTimer != nullptr;
+}
+
+/// <summary>
+/// 启动计时器
+/// </summary>
+void AlgorithmVisualization::ContagionPage::StartTimer()
+{
+	if (!IsTimerRunning())
+	{
+		Windows::Foundation::TimeSpan period{};
+		period.Duration = Speed * 10000;  //设置时间间隔
+		ThreadTimer = ThreadPoolTimer::CreatePeriodicTimer(
+			ref new TimerElapsedHandler([this](ThreadPoolTimer^ source)
+				{
+					GetThisState();
+					(this->*NavToNextStep)(); //计算出下一步的情况
+
+					if (IsTimerRunning())
+					{
+						CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High,
+							ref new DispatchedHandler([this]()
+								{
+									LoadNextState(); //将下一步加载到UI上
+								}
+						));
+					}
+				}), period
+		);
+	}
 }
 
 /// <summary>
@@ -207,36 +364,68 @@ void AlgorithmVisualization::ContagionPage::StopTimer()
 }
 
 /// <summary>
-/// 开始执行
+/// 下一步
 /// </summary>
 /// <param name="sender"></param>
 /// <param name="e"></param>
-void AlgorithmVisualization::ContagionPage::Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void AlgorithmVisualization::ContagionPage::Next_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	if (!IsTimerRunning())
+	GetThisState();
+	(this->*NavToNextStep)(); //计算出下一步的情况
+	LoadNextState(); //将下一步加载到UI上
+}
+
+/// <summary>
+/// 时间流逝速度改变
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::TimeElapseSpeedSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	Speed = (int64)(e->NewValue * 1000);
+	TimeElapseSpeedText->Text = e->NewValue + L"s";
+	if (IsTimerRunning())
 	{
-		Windows::Foundation::TimeSpan period{};
-		period.Duration = Speed * 10000;  //设置时间间隔
-		ThreadTimer = ThreadPoolTimer::CreatePeriodicTimer(
-			ref new TimerElapsedHandler([this](ThreadPoolTimer^ source)
-				{
-					CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High, 
-						ref new DispatchedHandler([this]()
-						{
-							(this->*NavToNextStep)();
-						}
-					));
-				}), period
-		);
+		StopTimer();
+		StartTimer();
 	}
 }
 
 /// <summary>
-/// 暂停执行
+/// 接触到的人数回调
 /// </summary>
 /// <param name="sender"></param>
 /// <param name="e"></param>
-void AlgorithmVisualization::ContagionPage::Pause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+void AlgorithmVisualization::ContagionPage::ContactPeopleCountSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
 {
-	StopTimer();
+	ContactPeopleCountText->Text = e->NewValue + L"人";
+	ContactPeopleCount = (int)e->NewValue;
+}
+
+/// <summary>
+/// 感染率改变时回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::InfectiousRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	InfectiousRateText->Text = (int)e->NewValue + L"%";
+	InfectiousRate = e->NewValue / 100;
+}
+
+
+void AlgorithmVisualization::ContagionPage::StartOrPause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	if (IsTimerRunning())
+	{
+		StopTimer();
+		Next->IsEnabled = true;
+		StartOrPause->Content = L"开始";
+	}
+	else
+	{
+		StartTimer();
+		Next->IsEnabled = false;
+		StartOrPause->Content = L"暂停";
+	}
 }

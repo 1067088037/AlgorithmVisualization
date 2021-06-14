@@ -5,11 +5,27 @@
 
 #pragma once
 
+#include <random>
 #include "Grid.h"
 #include "ContagionPage.g.h"
 
 namespace AlgorithmVisualization
 {
+	/// <summary>
+	/// 点
+	/// </summary>
+	public ref struct Point sealed
+	{
+		Point(int _x, int _y)
+		{
+			x = _x;
+			y = _y;
+		}
+		
+		property int x;
+		property int y;
+	};
+	
 	/// <summary>
 	/// 传染病类型
 	/// </summary>
@@ -37,8 +53,13 @@ namespace AlgorithmVisualization
 		void ContagionGrid_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
 		void DebugBtn_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void InitAlgorithm(ContagionModelType type); //初始化算法
-		void Start_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
-		void Pause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void GetThisState(); //获取当前步骤
+		void LoadNextState(); //加载下一个状态
+		void Next_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void TimeElapseSpeedSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
+		void ContactPeopleCountSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
+		void InfectiousRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
+		void StartOrPause_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 
 		void InitSIModel(); //初始化SI模型
 		void InitSISModel(); //初始化SIS模型
@@ -52,16 +73,47 @@ namespace AlgorithmVisualization
 		void SEIRNextStep(); //SEIR下一步
 		void SEIARNextStep(); //SEIAR下一步
 
+		RectState GetState(int x, int y, bool next = false); //获取指定坐标的状态
+		void SetState(int x, int y, RectState newState, bool next = true); //设置状态
+		void InfectNear(int srcX, int srcY, int nearCount, double probability); //感染邻近的人
+		bool CheckPointValid(int x, int y); //检查点的合法性
+		
 		bool IsTimerRunning(); //计时器是否在运行
+		void StartTimer(); //启动计时器
 		void StopTimer(); //停止计时器
 		
 		double lastGridWidth = 800.0; //上次柱状图宽度
 		double lastGridHeight = 400.0; //上次柱状图高度
-		int64 Speed = 100; //可视化速度
+		int64 Speed = 200; //可视化速度
+		int ContactPeopleCount = 20; //接触到的人数
+		double InfectiousRate = 0.1; //感染率
 
 		Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 		Grid^ InfectiousGrid; //传染病网格
+		property int xMax //最大x坐标
+		{
+			int get()
+			{
+				return InfectiousGrid->cols;
+			}
+		}
+		property int yMax //最大y坐标
+		{
+			int get()
+			{
+				return InfectiousGrid->rows;
+			}
+		}
+		
+		int DirectionX[8] = { -1, 0, 1, 1, 1, 0, -1, -1 }; //X的方向
+		int DirectionY[8] = { 1, 1, 1, 0, -1, -1, -1, 0 }; //Y的方向
 
-		NavToNextStepFun NavToNextStep;
+		NavToNextStepFun NavToNextStep; //导航到下一步
+		IVector<IVector<RectState>^>^ ThisStateVector; //当前状态向量
+		IVector<IVector<RectState>^>^ NextStateVector; //下一个状态向量
+
+		std::default_random_engine e{ GetTickCount() }; //随机数引擎
+		std::uniform_real_distribution<double> random{ 0, 1 };
+		
 	};
 }

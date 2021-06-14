@@ -16,7 +16,7 @@
 
         <StackPanel x:Name="ContagionGridStack" Grid.Row="0" Grid.Column="0" Margin="6">
             <TextBlock FontSize="24" Margin="6">网格图</TextBlock>
-             <Button x:Name="DebugBtn" Content="调试" Click="DebugBtn_Click"  Margin="12"></Button> 
+            <Button x:Name="DebugBtn" Content="调试" Click="DebugBtn_Click"  Margin="12"></Button>
             <StackPanel x:Name="ContagionGrid" 
                                         Margin="6" 
                                         Orientation="Vertical" 
@@ -54,19 +54,47 @@
         <StackPanel x:Name="SortDetail" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6">
             <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>
             <TextBlock x:Name="Introduction" Margin="6" TextWrapping="Wrap">算法介绍</TextBlock>
+            <TextBlock x:Name="FitInfectiousDisease" Margin="6" TextWrapping="Wrap">适用于：艾滋病</TextBlock>
             <StackPanel Margin="6" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="Start" Click="Start_Click">开始</Button>
-                <Button x:Name="Pause" Margin="20 0 0 0" Click="Pause_Click">暂停</Button>
+                <Button x:Name="StartOrPause" Click="StartOrPause_Click">开始</Button>
+                <Button x:Name="Next" Margin="20 0 0 0" Click="Next_Click">下一步</Button>
             </StackPanel>
-            <!-- <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6"> -->
-            <!--     <StackPanel Orientation="Vertical"> -->
-            <!--         <StackPanel Orientation="Horizontal"> -->
-            <!--             <TextBlock Margin="6" FontSize="18">执行进度</TextBlock> -->
-            <!--             <TextBlock x:Name="ProcessText" FontSize="16" VerticalAlignment="Center" Margin="6">100/100</TextBlock> -->
-            <!--         </StackPanel> -->
-            <!--         <Slider x:Name="ProgressSlider" Margin="6" ValueChanged="ProgressSlider_ValueChanged"></Slider> -->
-            <!--     </StackPanel> -->
-            <!-- </Border> -->
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="4" FontSize="18">时间流逝速度</TextBlock>
+                        <TextBlock x:Name="TimeElapseSpeedText" FontSize="16" VerticalAlignment="Center" Margin="4">0.2s</TextBlock>
+                    </StackPanel>
+                    <Slider x:Name="TimeElapseSpeedSlider" Margin="4" Maximum="2.0" Minimum="0.1" Value="0.2" StepFrequency="0.1" ValueChanged="TimeElapseSpeedSlider_ValueChanged"></Slider>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="4" FontSize="18">感染者每天接触到的人</TextBlock>
+                        <TextBlock x:Name="ContactPeopleCountText" FontSize="16" VerticalAlignment="Center" Margin="4">20人</TextBlock>
+                    </StackPanel>
+                    <Slider x:Name="ContactPeopleCountSlider" Margin="4" Maximum="80" Minimum="0" Value="20" StepFrequency="10" ValueChanged="ContactPeopleCountSlider_ValueChanged"></Slider>
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="4" FontSize="18">平均感染率</TextBlock>
+                        <TextBlock x:Name="InfectiousRateText" FontSize="16" VerticalAlignment="Center" Margin="4">10%</TextBlock>
+                    </StackPanel>
+                    <Slider x:Name="InfectiousRateSlider" Margin="4" Maximum="100" Minimum="0" Value="10" StepFrequency="1" ValueChanged="InfectiousRateSlider_ValueChanged"></Slider>
+                </StackPanel>
+            </Border>
+            <!--<Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="4" FontSize="18"></TextBlock>
+                        <TextBlock x:Name="" FontSize="16" VerticalAlignment="Center" Margin="4"></TextBlock>
+                    </StackPanel>
+                    <Slider x:Name="" Margin="4" Maximum="80" Minimum="0" Value="20" StepFrequency="10" ValueChanged=""></Slider>
+                </StackPanel>
+            </Border>-->
             <TextBlock x:Name="Console"></TextBlock>
         </StackPanel>
     </Grid>
