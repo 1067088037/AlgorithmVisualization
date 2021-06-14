@@ -35,7 +35,8 @@ namespace AlgorithmVisualization {
 		property Controls::StackPanel^ Container; //容器
 		property Shapes::Rectangle^ InternalRect; //内部的矩形
 		property RectState CurrentState; //当前状态
-		
+
+		//边缘
 		static property int Margin
 		{
 			int get()
@@ -63,6 +64,7 @@ namespace AlgorithmVisualization {
 
 		void OnSizeChanged(double _width, double _height); //尺寸改变时回调
 		Rect^ Get(int x, int y); //获取矩形
+		Rect^ GetCenter(); //获取中心矩形
 		void Set(int x, int y, Rect^ newRect); //设置矩形
 		void SetState(int x, int y, RectState newState); //设置矩形状态
 

@@ -309,7 +309,8 @@ void AlgorithmVisualization::SortAlgoPage::StartThreadTimer()
 						Executor->StopTimer();
 						return;
 					}
-					CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High, ref new DispatchedHandler([this]()
+					CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High, 
+						ref new DispatchedHandler([this]()
 						{
 							if (Executor->IsLastStep())
 							{

@@ -169,6 +169,11 @@ Rect^ AlgorithmVisualization::Grid::Get(int x, int y)
 	return Data->GetAt(y)->GetAt(x);
 }
 
+Rect^ AlgorithmVisualization::Grid::GetCenter()
+{
+	return Get(cols / 2, rows / 2);
+}
+
 /// <summary>
 /// 设置矩形
 /// </summary>

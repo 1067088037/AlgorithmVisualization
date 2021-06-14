@@ -55,8 +55,8 @@
             <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>
             <TextBlock x:Name="Introduction" Margin="6" TextWrapping="Wrap">算法介绍</TextBlock>
             <StackPanel Margin="6" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="Start">开始</Button>
-                <Button x:Name="Pause" Margin="20 0 0 0">暂停</Button>
+                <Button x:Name="Start" Click="Start_Click">开始</Button>
+                <Button x:Name="Pause" Margin="20 0 0 0" Click="Pause_Click">暂停</Button>
             </StackPanel>
             <!-- <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6"> -->
             <!--     <StackPanel Orientation="Vertical"> -->

@@ -73,27 +73,27 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 		else if (tag == "SIModel")
 		{
 			navigateTarget = ContagionPage::typeid;
-			((App^)Application::Current)->contagionAlgorithmType = 0;
+			((App^)Application::Current)->contagionAlgorithmType = (int)ContagionModelType::SIModel;
 		}
 		else if (tag == "SISModel")
 		{
 			navigateTarget = ContagionPage::typeid;
-			((App^)Application::Current)->contagionAlgorithmType = 1;
+			((App^)Application::Current)->contagionAlgorithmType = (int)ContagionModelType::SISModel;
 		}
 		else if (tag == "SIRModel")
 		{
 			navigateTarget = ContagionPage::typeid;
-			((App^)Application::Current)->contagionAlgorithmType = 2;
+			((App^)Application::Current)->contagionAlgorithmType = (int)ContagionModelType::SIRModel;
 		}
 		else if (tag == "SEIRModel")
 		{
 			navigateTarget = ContagionPage::typeid;
-			((App^)Application::Current)->contagionAlgorithmType = 3;
+			((App^)Application::Current)->contagionAlgorithmType = (int)ContagionModelType::SEIRModel;
 		}
 		else if (tag == "SEIARModel")
 		{
 			navigateTarget = ContagionPage::typeid;
-			((App^)Application::Current)->contagionAlgorithmType = 4;
+			((App^)Application::Current)->contagionAlgorithmType = (int)ContagionModelType::SEIARModel;
 		}
 		
 		if (navigateTarget != nullptr)

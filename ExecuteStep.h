@@ -51,7 +51,7 @@ namespace AlgorithmVisualization {
 		property IVector<int>^ SpeedList;
 		property IVector<SingleStep^>^ StepList; //步骤列表
 		property int CurrentStep; //当前的步骤
-		property int Speed; //演示速度
+		property int64 Speed; //演示速度
 		property Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 
 	protected private:
