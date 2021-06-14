@@ -97,8 +97,8 @@ AlgorithmVisualization::Grid::Grid(double _width, double _height, int _rows, int
 	rows = _rows;
 	cols = _cols;
 
-	double rectWidth = (width - 2.0 * Rect::Margin * cols) / cols; //矩形宽度
-	double rectHeight = (height - 2.0 * Rect::Margin * rows) / rows; //矩形高度
+	double rectWidth = (width - 2.0 * Rect::Margin * cols) / cols - 1; //矩形宽度
+	double rectHeight = (height - 2.0 * Rect::Margin * rows) / rows - 1; //矩形高度
 
 	//初始化视图
 	ThisView = ref new StackPanel();
@@ -144,8 +144,8 @@ void AlgorithmVisualization::Grid::OnSizeChanged(double _width, double _height)
 	width = _width;
 	height = _height;
 	
-	double rectWidth = (width - 2.0 * Rect::Margin * cols) / cols; //矩形宽度
-	double rectHeight = (height - 2.0 * Rect::Margin * rows) / rows; //矩形高度
+	double rectWidth = (width - 2.0 * Rect::Margin * cols) / cols - 1; //矩形宽度
+	double rectHeight = (height - 2.0 * Rect::Margin * rows) / rows - 1; //矩形高度
 
 	for (IVector<Rect^>^ i : Data)
 	{

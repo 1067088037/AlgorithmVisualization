@@ -27,8 +27,11 @@ ContagionPage::ContagionPage()
 	InitializeComponent();
 	int type = ((App^)(Application::Current))->sortAlgorithmType; //传染病模型类型
 
-	//auto grid = ref new Grid(lastGridWidth, lastGridHeight, 30, 30, RectState::Susceptible);
-	//ContagionGrid->Children->Append(grid->GetView());
+	int rows = 30;
+	int cols = 60;
+	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows, 
+		rows, cols, RectState::Susceptible);
+	ContagionGrid->Children->Append(InfectiousGrid->GetView());
 }
 
 
@@ -36,12 +39,8 @@ void AlgorithmVisualization::ContagionPage::ContagionGrid_SizeChanged(Platform::
 {
 	lastGridWidth = e->NewSize.Width;
 	lastGridHeight = e->NewSize.Height;
-}
 
-
-void AlgorithmVisualization::ContagionPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
-{
-
+	InfectiousGrid->OnSizeChanged(lastGridWidth, lastGridWidth / InfectiousGrid->cols * InfectiousGrid->rows);
 }
 
 

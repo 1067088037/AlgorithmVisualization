@@ -66,15 +66,15 @@ namespace AlgorithmVisualization {
 		void Set(int x, int y, Rect^ newRect); //设置矩形
 		void SetState(int x, int y, RectState newState); //设置矩形状态
 
+		property int rows; //行数
+		property int cols; //列数
+
 	private:
 		Windows::UI::Xaml::Controls::StackPanel^ ThisView; //视图
 		IVector<IVector<Rect^>^>^ Data; //网格的数据
 
 		double width{ 800.0 }; //宽度
 		double height{ 800.0 }; //高度
-
-		int rows{ 0 }; //行数
-		int cols{ 0 }; //列数
 		
 	};
 }
