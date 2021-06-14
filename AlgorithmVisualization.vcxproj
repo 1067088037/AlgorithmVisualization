@@ -176,6 +176,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeDrawable.h" />
+    <ClInclude Include="ContagionPage.xaml.h">
+      <DependentUpon>ContagionPage.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="Histogram.h" />
     <ClInclude Include="HomePage.xaml.h">
       <DependentUpon>HomePage.xaml</DependentUpon>
@@ -198,6 +202,9 @@
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ContagionPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="HomePage.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -277,6 +284,10 @@
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
     <ClCompile Include="CodeDrawable.cpp" />
+    <ClCompile Include="ContagionPage.xaml.cpp">
+      <DependentUpon>ContagionPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Histogram.cpp" />
     <ClCompile Include="HomePage.xaml.cpp">
       <DependentUpon>HomePage.xaml</DependentUpon>

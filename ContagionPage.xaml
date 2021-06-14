@@ -1,0 +1,73 @@
+﻿<Page
+    x:Class="AlgorithmVisualization.ContagionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AlgorithmVisualization"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel x:Name="ContagionGridStack" Grid.Row="0" Grid.Column="0" Margin="6">
+            <TextBlock FontSize="24" Margin="6">网格图</TextBlock>
+             <Button x:Name="DebugBtn" Content="调试" Click="DebugBtn_Click"  Margin="12"></Button> 
+            <StackPanel x:Name="ContagionGrid" 
+                                        Margin="6" 
+                                        Orientation="Vertical" 
+                                        SizeChanged="ContagionGrid_SizeChanged"
+                                        VerticalAlignment="Stretch" 
+                                        HorizontalAlignment="Stretch">
+
+            </StackPanel>
+            <TextBlock FontSize="24" Margin="6 24 6 6">图例</TextBlock>
+            <Grid x:Name="SortHistogramLegend" Margin="6">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel Margin="12">
+                        <Rectangle Width="50" Height="50" Fill="Blue"></Rectangle>
+                        <TextBlock TextAlignment="Center" Margin="6">S-易感者</TextBlock>
+                    </StackPanel>
+                    <StackPanel Margin="12">
+                        <Rectangle Width="50" Height="50" Fill="Red"></Rectangle>
+                        <TextBlock TextAlignment="Center" Margin="6">I-感染者</TextBlock>
+                    </StackPanel>
+                    <StackPanel Margin="12">
+                        <Rectangle Width="50" Height="50" Fill="Green"></Rectangle>
+                        <TextBlock TextAlignment="Center" Margin="6">R-康复者</TextBlock>
+                    </StackPanel>
+                    <StackPanel Margin="12">
+                        <Rectangle Width="50" Height="50" Fill="Orange"></Rectangle>
+                        <TextBlock TextAlignment="Center" Margin="6">E-潜伏者</TextBlock>
+                    </StackPanel>
+                    <StackPanel Margin="12">
+                        <Rectangle Width="50" Height="50" Fill="Purple"></Rectangle>
+                        <TextBlock TextAlignment="Center" Margin="6">A-无症状</TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <StackPanel x:Name="SortDetail" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6">
+            <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>
+            <TextBlock x:Name="Introduction" Margin="6" TextWrapping="Wrap">算法介绍</TextBlock>
+            <StackPanel Margin="6" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="Start">开始</Button>
+                <Button x:Name="Pause" Margin="20 0 0 0">暂停</Button>
+            </StackPanel>
+            <!-- <Border BorderBrush="Gray" BorderThickness="1" Padding="6" CornerRadius="6" Margin="6"> -->
+            <!--     <StackPanel Orientation="Vertical"> -->
+            <!--         <StackPanel Orientation="Horizontal"> -->
+            <!--             <TextBlock Margin="6" FontSize="18">执行进度</TextBlock> -->
+            <!--             <TextBlock x:Name="ProcessText" FontSize="16" VerticalAlignment="Center" Margin="6">100/100</TextBlock> -->
+            <!--         </StackPanel> -->
+            <!--         <Slider x:Name="ProgressSlider" Margin="6" ValueChanged="ProgressSlider_ValueChanged"></Slider> -->
+            <!--     </StackPanel> -->
+            <!-- </Border> -->
+            <TextBlock x:Name="Console"></TextBlock>
+        </StackPanel>
+    </Grid>
+</Page>

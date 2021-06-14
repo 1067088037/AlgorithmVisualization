@@ -18,6 +18,7 @@
     <ClCompile Include="ExecuteStep.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="CodeDrawable.cpp" />
+    <ClCompile Include="Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="ExecuteStep.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="CodeDrawable.h" />
+    <ClInclude Include="Grid.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
@@ -207,6 +209,7 @@
     <Page Include="MainPage.xaml" />
     <Page Include="HomePage.xaml" />
     <Page Include="SortAlgoPage.xaml" />
+    <Page Include="ContagionPage.xaml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -15,7 +15,8 @@ namespace AlgorithmVisualization
 	ref class App sealed
 	{
 	public:
-		property int sortAlgorithmType;
+		property int sortAlgorithmType; //排序算法类型
+		property int contagionAlgorithmType; //传染病算法类型
 	
 	protected:
 		virtual void OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e) override;

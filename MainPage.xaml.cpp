@@ -7,6 +7,7 @@
 #include "MainPage.xaml.h"
 #include "HomePage.xaml.h"
 #include "SortAlgoPage.xaml.h"
+#include "ContagionPage.xaml.h"
 
 using namespace AlgorithmVisualization;
 
@@ -69,6 +70,32 @@ void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml
 			navigateTarget = SortAlgoPage::typeid;
 			((App^)Application::Current)->sortAlgorithmType = 2;
 		}
+		else if (tag == "SIModel")
+		{
+			navigateTarget = ContagionPage::typeid;
+			((App^)Application::Current)->contagionAlgorithmType = 0;
+		}
+		else if (tag == "SISModel")
+		{
+			navigateTarget = ContagionPage::typeid;
+			((App^)Application::Current)->contagionAlgorithmType = 1;
+		}
+		else if (tag == "SIRModel")
+		{
+			navigateTarget = ContagionPage::typeid;
+			((App^)Application::Current)->contagionAlgorithmType = 2;
+		}
+		else if (tag == "SEIRModel")
+		{
+			navigateTarget = ContagionPage::typeid;
+			((App^)Application::Current)->contagionAlgorithmType = 3;
+		}
+		else if (tag == "SEIARModel")
+		{
+			navigateTarget = ContagionPage::typeid;
+			((App^)Application::Current)->contagionAlgorithmType = 4;
+		}
+		
 		if (navigateTarget != nullptr)
 			ContentFrame->Navigate(navigateTarget, nullptr, args->RecommendedNavigationTransitionInfo); //导航到相应页面
 	}
