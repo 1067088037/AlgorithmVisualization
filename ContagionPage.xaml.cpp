@@ -39,7 +39,11 @@ ContagionPage::ContagionPage()
 	InitAlgorithm(type);
 }
 
-AlgorithmVisualization::ContagionPage::~ContagionPage()
+/// <summary>
+/// 页面跳转离开时调用
+/// </summary>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::OnNavigatedFrom(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e)
 {
 	StopTimer(); //关闭计时器
 }
@@ -64,7 +68,7 @@ void AlgorithmVisualization::ContagionPage::ContagionGrid_SizeChanged(Platform::
 /// <param name="e"></param>
 void AlgorithmVisualization::ContagionPage::DebugBtn_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
-	
+
 }
 
 /// <summary>
@@ -83,10 +87,10 @@ void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType typ
 	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows,
 		rows, cols, RectState::Susceptible);
 	ContagionGrid->Children->Append(InfectiousGrid->GetView());
-	
+
 	InfectiousGrid->GetCenter()->ChangeState(RectState::Infectious);
 	GetThisState();
-	
+
 	switch (type)
 	{
 	case ContagionModelType::SIModel:
@@ -160,6 +164,8 @@ void AlgorithmVisualization::ContagionPage::InitSIModel()
 	Introduction->Text = L"SI传播模型是最简单的疾病传播模型，模型中的所有个体都只可能处于两个状态中的一个：即易感(S)状态或感染(I)状态。SI模型中的个体一旦被感染后就永远处于感染状态。";
 	FitInfectiousDisease->Text = L"适用于：艾滋病";
 
+	InfectiousRate = 0.05;
+
 	RecoveryRateBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -229,7 +235,7 @@ void AlgorithmVisualization::ContagionPage::SINextStep()
 			if (GetState(i, j, false) == RectState::Infectious) //如果感染则可以传染给别人
 				InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate);
 		}
-	}	
+	}
 }
 
 /// <summary>
@@ -395,7 +401,7 @@ void AlgorithmVisualization::ContagionPage::SetState(int x, int y, RectState new
 /// <param name="probability"></param>
 void AlgorithmVisualization::ContagionPage::ChangeNear(int srcX, int srcY, int contactCount, double probability, RectState from, RectState to)
 {
-	if (contactCount < 0 || contactCount > 8) 
+	if (contactCount < 0 || contactCount > 8)
 		throw ref new InvalidArgumentException(L"临近的人必须是0~8的整数");
 
 	//获取邻近的人的状态
@@ -563,7 +569,6 @@ void AlgorithmVisualization::ContagionPage::ContactPeopleCountSlider_ValueChange
 /// <param name="e"></param>
 void AlgorithmVisualization::ContagionPage::InfectiousRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
 {
-	InfectiousRateText->Text = (int)e->NewValue + L"%";
 	InfectiousRate = e->NewValue / 100;
 }
 
