@@ -50,6 +50,7 @@
                     </StackPanel>
                 </StackPanel>
             </Grid>
+            <TextBlock Margin="12" FontWeight="Bold" TextWrapping="Wrap" Foreground="Yellow">右侧默认的参数并非任何传染病的真实数据，请使用者根据自己想要模拟的情况进行设定。本软件只提供数学模型，不对参数负责。本软件只能用于对数学建模算法的学习，不可代替任何专业的医疗指导。现实的情况远远比数学模型更加复杂，一切请以现实为准。</TextBlock>
         </StackPanel>
         <StackPanel x:Name="SortDetail" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="6">
             <TextBlock x:Name="AlgorithmName" FontSize="24" Margin="6">算法名称</TextBlock>
