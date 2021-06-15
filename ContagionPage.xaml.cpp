@@ -39,6 +39,11 @@ ContagionPage::ContagionPage()
 	InitAlgorithm(type);
 }
 
+AlgorithmVisualization::ContagionPage::~ContagionPage()
+{
+	StopTimer(); //关闭计时器
+}
+
 /// <summary>
 /// 尺寸改变时回调
 /// </summary>
@@ -153,6 +158,7 @@ void AlgorithmVisualization::ContagionPage::InitSIModel()
 	FitInfectiousDisease->Text = L"适用于：艾滋病";
 
 	RecoveryRateBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -163,6 +169,8 @@ void AlgorithmVisualization::ContagionPage::InitSISModel()
 	NavToNextStep = &ContagionPage::SISNextStep;
 	Introduction->Text = L"SIS传播模型在SI模型基础上加入康复的概率，即治愈率。该模型适用于只有易感者和患病者两类人群，但会反复发作的疾病。易感者与患病者有效接触即被感染，变为患病者，可被治愈再次变为易感者，无潜伏期、无免疫力。";
 	FitInfectiousDisease->Text = L"适用于：细菌性痢疾";
+
+	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -173,6 +181,8 @@ void AlgorithmVisualization::ContagionPage::InitSIRModel()
 	NavToNextStep = &ContagionPage::SIRNextStep;
 	Introduction->Text = L"适用于有易感者、患病者和康复者三类人群，治愈后不会再发的疾病。康复者具有很强免疫力，不会被再次感染。对于致死性的传染病也可以使用这个模型，死亡的病人也可以归入康复者。此时的康复者可以理解为退出了传染系统。";
 	FitInfectiousDisease->Text = L"适用于：水痘";
+
+	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -181,7 +191,8 @@ void AlgorithmVisualization::ContagionPage::InitSIRModel()
 void AlgorithmVisualization::ContagionPage::InitSEIRModel()
 {
 	NavToNextStep = &ContagionPage::SEIRNextStep;
-
+	Introduction->Text = L"许多疾病存在潜伏期，在此期间个人不能感染其它人并有一定概率转化为感染者。在此类模型中，个体经历了较长的潜伏期（“暴露”类别），因此个体已被感染但尚未具有感染力。该模型在SIR模型中增加了E（暴露者）用于表示处于潜伏期的个体。";
+	FitInfectiousDisease->Text = L"适用于：登革热";
 }
 
 /// <summary>
@@ -261,7 +272,30 @@ void AlgorithmVisualization::ContagionPage::SIRNextStep()
 /// </summary>
 void AlgorithmVisualization::ContagionPage::SEIRNextStep()
 {
-
+	for (int i = 0; i < xMax; i++)
+	{
+		for (int j = 0; j < yMax; j++)
+		{
+			if (GetState(i, j, false) == RectState::Infectious)
+			{
+				if (random(e) <= RecoveryRate)
+				{
+					SetState(i, j, RectState::Recovered, true); //在一定概率下转化为康复者
+				}
+				else
+				{
+					ChangeToExposed(i, j, ContactPeopleCount / 10, InfectiousRate); //如果没有痊愈则继续传染
+				}
+			}
+			else if (GetState(i, j, false) == RectState::Exposed)
+			{
+				if (random(e) <= ExposedToInfectiousRate)
+				{
+					SetState(i, j, RectState::Infectious, true); //在一定概率下转化为感染者
+				}
+			}
+		}
+	}
 }
 
 /// <summary>
@@ -301,13 +335,13 @@ void AlgorithmVisualization::ContagionPage::SetState(int x, int y, RectState new
 }
 
 /// <summary>
-/// 感染临近的人
+/// 改变周围的人
 /// </summary>
 /// <param name="srcX"></param>
 /// <param name="srcY"></param>
 /// <param name="nearCount"></param>
 /// <param name="probability"></param>
-void AlgorithmVisualization::ContagionPage::InfectNear(int srcX, int srcY, int contactCount, double probability)
+void AlgorithmVisualization::ContagionPage::ChangeNear(int srcX, int srcY, int contactCount, double probability, RectState from, RectState to)
 {
 	if (contactCount < 0 || contactCount > 8) 
 		throw ref new InvalidArgumentException(L"临近的人必须是0~8的整数");
@@ -334,11 +368,35 @@ void AlgorithmVisualization::ContagionPage::InfectNear(int srcX, int srcY, int c
 	for (unsigned int i = 0; i < nearPeople->Size; ++i)
 	{
 		auto people = nearPeople->GetAt(i);
-		if (GetState(people->x, people->y) == RectState::Susceptible && random(e) <= probability)
+		if (GetState(people->x, people->y) == from && random(e) <= probability)
 		{
-			SetState(people->x, people->y, RectState::Infectious, true);
+			SetState(people->x, people->y, to, true);
 		}
 	}
+}
+
+/// <summary>
+/// 感染周围人
+/// </summary>
+/// <param name="srcX"></param>
+/// <param name="srcY"></param>
+/// <param name="nearCount"></param>
+/// <param name="probability"></param>
+void AlgorithmVisualization::ContagionPage::InfectNear(int srcX, int srcY, int nearCount, double probability)
+{
+	ChangeNear(srcX, srcY, nearCount, probability, RectState::Susceptible, RectState::Infectious);
+}
+
+/// <summary>
+/// 使周围人变为潜伏者
+/// </summary>
+/// <param name="srcX"></param>
+/// <param name="srcY"></param>
+/// <param name="nearCount"></param>
+/// <param name="probability"></param>
+void AlgorithmVisualization::ContagionPage::ChangeToExposed(int srcX, int srcY, int nearCount, double probability)
+{
+	ChangeNear(srcX, srcY, nearCount, probability, RectState::Susceptible, RectState::Exposed);
 }
 
 /// <summary>
@@ -383,7 +441,10 @@ void AlgorithmVisualization::ContagionPage::StartTimer()
 						CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High,
 							ref new DispatchedHandler([this]()
 								{
-									LoadNextState(); //将下一步加载到UI上
+									if (IsTimerRunning())
+									{
+										LoadNextState(); //将下一步加载到UI上
+									}
 								}
 						));
 					}
@@ -494,4 +555,15 @@ void AlgorithmVisualization::ContagionPage::RecoveryRateSlider_ValueChanged(Plat
 void AlgorithmVisualization::ContagionPage::Reset_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	InitAlgorithm(currentType);
+}
+
+/// <summary>
+/// 潜伏者转正概率改变回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::ExposedToInfectiousSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	ExposedToInfectiousText->Text = (int)e->NewValue + L"%";
+	ExposedToInfectiousRate = e->NewValue;
 }

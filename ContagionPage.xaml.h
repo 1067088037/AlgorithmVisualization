@@ -50,6 +50,8 @@ namespace AlgorithmVisualization
 		ContagionPage();
 	
 	private:
+		~ContagionPage();
+
 		void ContagionGrid_SizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e);
 		void DebugBtn_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void InitAlgorithm(ContagionModelType type); //初始化算法
@@ -75,7 +77,9 @@ namespace AlgorithmVisualization
 
 		RectState GetState(int x, int y, bool next = false); //获取指定坐标的状态
 		void SetState(int x, int y, RectState newState, bool next = true); //设置状态
-		void InfectNear(int srcX, int srcY, int nearCount, double probability); //感染邻近的人
+		void ChangeNear(int srcX, int srcY, int nearCount, double probability, RectState from, RectState to); //感染邻近的人
+		void InfectNear(int srcX, int srcY, int nearCount, double probability); //感染附近
+		void ChangeToExposed(int srcX, int srcY, int nearCount, double probability); //变为潜伏者
 		bool CheckPointValid(int x, int y); //检查点的合法性
 		
 		bool IsTimerRunning(); //计时器是否在运行
@@ -89,6 +93,7 @@ namespace AlgorithmVisualization
 		int ContactPeopleCount = 20; //接触到的人数
 		double InfectiousRate = 0.1; //感染率
 		double RecoveryRate = 0.1; //康复率
+		double ExposedToInfectiousRate = 0.1; //潜伏者转正概率
 
 		Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 		Grid^ InfectiousGrid; //传染病网格
@@ -119,5 +124,6 @@ namespace AlgorithmVisualization
 		
 		void RecoveryRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
 		void Reset_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
+		void ExposedToInfectiousSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
 	};
 }
