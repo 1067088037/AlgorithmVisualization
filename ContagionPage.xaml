@@ -63,64 +63,64 @@
             <Border x:Name="TimeElapseSpeedBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="6">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">时间流逝速度</TextBlock>
-                        <TextBlock x:Name="TimeElapseSpeedText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">0.2s</TextBlock>
+                        <TextBlock Margin="4 0 4 0">时间流逝速度</TextBlock>
+                        <TextBlock x:Name="TimeElapseSpeedText" Margin="4 0 4 0">0.2s</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="TimeElapseSpeedSlider"  Margin="4 0 4 0" Maximum="2.0" Minimum="0.05" Value="0.2" StepFrequency="0.05" ValueChanged="TimeElapseSpeedSlider_ValueChanged"></Slider>
+                    <Slider x:Name="TimeElapseSpeedSlider" Margin="4 0 4 0" Maximum="2.0" Minimum="0.05" Value="0.2" StepFrequency="0.05" ValueChanged="TimeElapseSpeedSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="ContactPeopleCountBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">感染者每天接触到的人</TextBlock>
-                        <TextBlock x:Name="ContactPeopleCountText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">20人</TextBlock>
+                        <TextBlock Margin="4 0 4 0">感染者每天接触到的人</TextBlock>
+                        <TextBlock x:Name="ContactPeopleCountText" Margin="4 0 4 0">20人</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="ContactPeopleCountSlider"  Margin="4 0 4 0" Maximum="80" Minimum="0" Value="20" StepFrequency="10" ValueChanged="ContactPeopleCountSlider_ValueChanged"></Slider>
+                    <Slider x:Name="ContactPeopleCountSlider" Margin="4 0 4 0" Maximum="80" Minimum="0" Value="20" StepFrequency="10" ValueChanged="ContactPeopleCountSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="InfectiousRateBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">易感人群接触感染率</TextBlock>
-                        <TextBlock x:Name="InfectiousRateText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">20%</TextBlock>
+                        <TextBlock Margin="4 0 4 0">易感人群接触感染率</TextBlock>
+                        <TextBlock x:Name="InfectiousRateText" Margin="4 0 4 0">20%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="InfectiousRateSlider"  Margin="4 0 4 0" Maximum="100" Minimum="0" Value="20" StepFrequency="1" ValueChanged="InfectiousRateSlider_ValueChanged"></Slider>
+                    <Slider x:Name="InfectiousRateSlider" Margin="4 0 4 0" Maximum="100" Minimum="0" Value="20" StepFrequency="1" ValueChanged="InfectiousRateSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="RecoveryRateBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">显性感染者每日康复率</TextBlock>
-                        <TextBlock x:Name="RecoveryRateText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">10%</TextBlock>
+                        <TextBlock Margin="4 0 4 0">显性感染者每日康复率</TextBlock>
+                        <TextBlock x:Name="RecoveryRateText" Margin="4 0 4 0">10%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="RecoveryRateSlider"  Margin="4 0 4 0" Maximum="50" Minimum="0" Value="10" StepFrequency="0.1" ValueChanged="RecoveryRateSlider_ValueChanged"></Slider>
+                    <Slider x:Name="RecoveryRateSlider" Margin="4 0 4 0" Maximum="50" Minimum="0" Value="10" StepFrequency="0.1" ValueChanged="RecoveryRateSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="AsymptomaticRecoveryBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">隐性感染者每日康复率</TextBlock>
-                        <TextBlock x:Name="AsymptomaticRecoveryText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">5%</TextBlock>
+                        <TextBlock Margin="4 0 4 0">隐性感染者每日康复率</TextBlock>
+                        <TextBlock x:Name="AsymptomaticRecoveryText" Margin="4 0 4 0">5%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="AsymptomaticRecoverySlider"  Margin="4 0 4 0" Maximum="50" Minimum="0" Value="2" StepFrequency="0.1" ValueChanged="AsymptomaticRecoverySlider_ValueChanged"></Slider>
+                    <Slider x:Name="AsymptomaticRecoverySlider" Margin="4 0 4 0" Maximum="50" Minimum="0" Value="2" StepFrequency="0.1" ValueChanged="AsymptomaticRecoverySlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="ExposedToInfectiousBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">潜伏期转显性感染者率</TextBlock>
-                        <TextBlock x:Name="ExposedToInfectiousText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">50%</TextBlock>
+                        <TextBlock Margin="4 0 4 0">潜伏期转显性感染者率</TextBlock>
+                        <TextBlock x:Name="ExposedToInfectiousText" Margin="4 0 4 0">50%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="ExposedToInfectiousSlider"  Margin="4 0 4 0" Maximum="100" Minimum="0" Value="50" StepFrequency="1" ValueChanged="ExposedToInfectiousSlider_ValueChanged"></Slider>
+                    <Slider x:Name="ExposedToInfectiousSlider" Margin="4 0 4 0" Maximum="100" Minimum="0" Value="50" StepFrequency="1" ValueChanged="ExposedToInfectiousSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <Border x:Name="ExposedToAsymptomaticBox" BorderBrush="Gray" BorderThickness="1" Padding="4" CornerRadius="6" Margin="4">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock  Margin="4 0 4 0">潜伏者转隐性感染者率</TextBlock>
-                        <TextBlock x:Name="ExposedToAsymptomaticText" FontSize="16" VerticalAlignment="Center" Margin="4 0 4 0">20%</TextBlock>
+                        <TextBlock Margin="4 0 4 0">潜伏者转隐性感染者率</TextBlock>
+                        <TextBlock x:Name="ExposedToAsymptomaticText" Margin="4 0 4 0">20%</TextBlock>
                     </StackPanel>
-                    <Slider x:Name="ExposedToAsymptomaticSlider"  Margin="4 0 4 0" Maximum="100" Minimum="0" Value="20" StepFrequency="1" ValueChanged="ExposedToAsymptomaticSlider_ValueChanged"></Slider>
+                    <Slider x:Name="ExposedToAsymptomaticSlider" Margin="4 0 4 0" Maximum="100" Minimum="0" Value="20" StepFrequency="1" ValueChanged="ExposedToAsymptomaticSlider_ValueChanged"></Slider>
                 </StackPanel>
             </Border>
             <TextBlock x:Name="Console"></TextBlock>
