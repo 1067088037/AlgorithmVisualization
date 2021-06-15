@@ -143,7 +143,10 @@ void AlgorithmVisualization::ContagionPage::LoadNextState()
 	{
 		for (int j = 0; j < InfectiousGrid->rows; j++)
 		{
-			InfectiousGrid->SetState(i, j, NextStateVector->GetAt(i)->GetAt(j));
+			if (this == nullptr || InfectiousGrid == nullptr) return;
+			if (((App^)Application::Current)->contagionAlgorithmType == -1) return;
+			auto state = NextStateVector->GetAt(i)->GetAt(j);
+			InfectiousGrid->SetState(i, j, state);
 		}
 	}
 }
@@ -159,6 +162,8 @@ void AlgorithmVisualization::ContagionPage::InitSIModel()
 
 	RecoveryRateBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -171,6 +176,8 @@ void AlgorithmVisualization::ContagionPage::InitSISModel()
 	FitInfectiousDisease->Text = L"适用于：细菌性痢疾";
 
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -183,6 +190,8 @@ void AlgorithmVisualization::ContagionPage::InitSIRModel()
 	FitInfectiousDisease->Text = L"适用于：水痘";
 
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -191,8 +200,11 @@ void AlgorithmVisualization::ContagionPage::InitSIRModel()
 void AlgorithmVisualization::ContagionPage::InitSEIRModel()
 {
 	NavToNextStep = &ContagionPage::SEIRNextStep;
-	Introduction->Text = L"许多疾病存在潜伏期，在此期间个人不能感染其它人并有一定概率转化为感染者。在此类模型中，个体经历了较长的潜伏期（“暴露”类别），因此个体已被感染但尚未具有感染力。该模型在SIR模型中增加了E（暴露者）用于表示处于潜伏期的个体。";
+	Introduction->Text = L"许多疾病存在潜伏期，在此期间个人不能感染其它人并有一定概率转化为感染者。在此类模型中，个体经历了较长的潜伏期，因此个体已被感染但尚未具有传染力。该模型在SIR模型中增加了E（暴露者）用于表示处于潜伏期的个体。";
 	FitInfectiousDisease->Text = L"适用于：登革热";
+
+	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
+	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
 
 /// <summary>
@@ -201,7 +213,8 @@ void AlgorithmVisualization::ContagionPage::InitSEIRModel()
 void AlgorithmVisualization::ContagionPage::InitSEIARModel()
 {
 	NavToNextStep = &ContagionPage::SEIARNextStep;
-
+	Introduction->Text = L"部分疾病存在具有传染性的无症状感染者，无症状意味着这类人群可能无法察觉自己患病进而无法及时就医，造成更大的人口流动性和更低的康复率。在SEIAR模型中，引入了无症状感染者A，把SEIR模型中的I进一步分为I和A。";
+	FitInfectiousDisease->Text = L"适用于：2019-nCov 新型冠状病毒肺炎";
 }
 
 /// <summary>
@@ -303,7 +316,46 @@ void AlgorithmVisualization::ContagionPage::SEIRNextStep()
 /// </summary>
 void AlgorithmVisualization::ContagionPage::SEIARNextStep()
 {
-
+	for (int i = 0; i < xMax; i++)
+	{
+		for (int j = 0; j < yMax; j++)
+		{
+			auto rectState = GetState(i, j, false);
+			if (rectState == RectState::Infectious)
+			{
+				if (random(e) <= RecoveryRate)
+				{
+					SetState(i, j, RectState::Recovered, true); //在一定概率下转化为康复者
+				}
+				else
+				{
+					ChangeToExposed(i, j, ContactPeopleCount / 10, InfectiousRate); //如果没有痊愈则继续传染
+				}
+			}
+			else if (rectState == RectState::Asymptomatic)
+			{
+				if (random(e) <= AsymptomaticRecoveryRate)
+				{
+					SetState(i, j, RectState::Recovered, true); //在一定概率下转化为康复者
+				}
+				else
+				{
+					ChangeToExposed(i, j, ContactPeopleCount / 10, InfectiousRate); //如果没有痊愈则继续传染
+				}
+			}
+			else if (rectState == RectState::Exposed)
+			{
+				if (random(e) <= ExposedToInfectiousRate)
+				{
+					SetState(i, j, RectState::Infectious, true); //在一定概率下转化为感染者
+				}
+				else if (random(e) <= ExposedToAsymptomaticRate)
+				{
+					SetState(i, j, RectState::Asymptomatic, true); //在一定概率下转化为隐性感染者
+				}
+			}
+		}
+	}
 }
 
 /// <summary>
@@ -436,12 +488,12 @@ void AlgorithmVisualization::ContagionPage::StartTimer()
 					GetThisState();
 					(this->*NavToNextStep)(); //计算出下一步的情况
 
-					if (IsTimerRunning())
+					if (IsTimerRunning() && this != nullptr)
 					{
-						CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::High,
+						CoreApplication::MainView->CoreWindow->Dispatcher->RunAsync(CoreDispatcherPriority::Normal,
 							ref new DispatchedHandler([this]()
 								{
-									if (IsTimerRunning())
+									if (IsTimerRunning() && this != nullptr)
 									{
 										LoadNextState(); //将下一步加载到UI上
 									}
@@ -564,6 +616,36 @@ void AlgorithmVisualization::ContagionPage::Reset_Click(Platform::Object^ sender
 /// <param name="e"></param>
 void AlgorithmVisualization::ContagionPage::ExposedToInfectiousSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
 {
-	ExposedToInfectiousText->Text = (int)e->NewValue + L"%";
-	ExposedToInfectiousRate = e->NewValue;
+	ExposedToInfectiousRate = e->NewValue / 100;
+	if (ExposedToInfectiousRate + ExposedToAsymptomaticRate >= 1.0)
+	{
+		ExposedToAsymptomaticRate = 1 - ExposedToInfectiousRate;
+		ExposedToAsymptomaticSlider->Value = ExposedToAsymptomaticRate * 100;
+	}
+}
+
+/// <summary>
+/// 潜伏者转隐性感染者概率改变时回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::ExposedToAsymptomaticSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	ExposedToAsymptomaticRate = e->NewValue / 100;
+	if (ExposedToInfectiousRate + ExposedToAsymptomaticRate >= 1.0)
+	{
+		ExposedToInfectiousRate = 1 - ExposedToAsymptomaticRate;
+		ExposedToInfectiousSlider->Value = ExposedToInfectiousRate * 100;
+	}
+}
+
+/// <summary>
+/// 隐性感染者康复率改变回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
+void AlgorithmVisualization::ContagionPage::AsymptomaticRecoverySlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
+{
+	AsymptomaticRecoveryText->Text = (int)e->NewValue + L"%";
+	AsymptomaticRecoveryRate = e->NewValue / 100;
 }

@@ -93,8 +93,41 @@ namespace AlgorithmVisualization
 		int ContactPeopleCount = 20; //接触到的人数
 		double InfectiousRate = 0.1; //感染率
 		double RecoveryRate = 0.1; //康复率
-		double ExposedToInfectiousRate = 0.1; //潜伏者转正概率
 
+		double exposedToInfectiousRate = 0.1;
+		property double ExposedToInfectiousRate //潜伏者转显性感染者概率
+		{
+			double get()
+			{
+				return exposedToInfectiousRate;
+			}
+
+			void set(double value)
+			{
+				exposedToInfectiousRate = value;
+				if (ExposedToInfectiousText != nullptr)
+					ExposedToInfectiousText->Text = (int)(100 * value) + L"%";
+			}
+		}
+		
+		double exposedToAsymptomaticRate = 0.1; //潜伏者转隐形感染者概率
+		property double ExposedToAsymptomaticRate //潜伏者转隐形感染者概率
+		{
+			double get()
+			{
+				return exposedToAsymptomaticRate;
+			}
+
+			void set(double value)
+			{
+				exposedToAsymptomaticRate = value;
+				if (ExposedToAsymptomaticText != nullptr)
+					ExposedToAsymptomaticText->Text = (int)(100 * value) + L"%";
+			}
+		}
+
+		double AsymptomaticRecoveryRate = 0.1; //隐性感染者康复率
+		
 		Windows::System::Threading::ThreadPoolTimer^ ThreadTimer; //计时器线程
 		Grid^ InfectiousGrid; //传染病网格
 		property int xMax //最大x坐标
@@ -125,5 +158,7 @@ namespace AlgorithmVisualization
 		void RecoveryRateSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
 		void Reset_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e);
 		void ExposedToInfectiousSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
-	};
+		void ExposedToAsymptomaticSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e); 
+		void AsymptomaticRecoverySlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e);
+};
 }

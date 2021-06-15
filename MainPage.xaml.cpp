@@ -44,6 +44,9 @@ void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ send
 // 主页导航的Item被点击时回调
 void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml::Controls::NavigationView^ sender, Windows::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
+	((App^)Application::Current)->sortAlgorithmType = -1;
+	((App^)Application::Current)->contagionAlgorithmType = -1;
+
 	if (args->IsSettingsInvoked) //当设置被点击
 	{
 
