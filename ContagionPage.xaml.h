@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include <random>
 #include "Grid.h"
 #include "ContagionPage.g.h"
@@ -97,7 +98,6 @@ namespace AlgorithmVisualization
 		double lastGridHeight = 400.0; //上次柱状图高度
 		int64 Speed = 200; //可视化速度
 		int ContactPeopleCount = 20; //接触到的人数
-		double RecoveryRate = 0.1; //康复率
 
 		double infectiousRate = 0.1; //感染率
 		property double InfectiousRate //感染率
@@ -114,6 +114,25 @@ namespace AlgorithmVisualization
 				{
 					InfectiousRateText->Text = (int)(100 * value) + L"%";
 					InfectiousRateSlider->Value = 100 * value;
+				}
+			}
+		}
+
+		double recoveryRate = 0.1;
+		property double RecoveryRate //康复率
+		{
+			double get()
+			{
+				return recoveryRate;
+			}
+
+			void set(double value)
+			{
+				recoveryRate = value;
+				if (RecoveryRateText != nullptr)
+				{
+					RecoveryRateText->Text = (int)(100 * value) + L"%";
+					RecoveryRateSlider->Value = 100 * value;
 				}
 			}
 		}
@@ -173,8 +192,8 @@ namespace AlgorithmVisualization
 		int DirectionY[8] = { 1, 1, 1, 0, -1, -1, -1, 0 }; //Y的方向
 
 		NavToNextStepFun NavToNextStep; //导航到下一步
-		IVector<IVector<RectState>^>^ ThisStateVector; //当前状态向量
-		IVector<IVector<RectState>^>^ NextStateVector; //下一个状态向量
+		std::vector<std::vector<RectState>> ThisStateVector; //当前状态向量
+		std::vector<std::vector<RectState>> NextStateVector; //下一个状态向量
 
 		std::default_random_engine e{ GetTickCount() }; //随机数引擎
 		std::uniform_real_distribution<double> random{ 0, 1 };

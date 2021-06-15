@@ -84,6 +84,17 @@ void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType typ
 	ContagionGrid->Children->Clear();
 	int rows = 30;
 	int cols = 60;
+
+	//创建本次和下次的向量
+	ThisStateVector = std::vector<std::vector<RectState>>(cols);
+	NextStateVector = std::vector<std::vector<RectState>>(cols);
+	for (int i = 0; i < cols; i++)
+	{
+		//给列插入行
+		ThisStateVector[i] = std::vector<RectState>(rows, RectState::Susceptible);
+		NextStateVector[i] = std::vector<RectState>(rows, RectState::Susceptible);
+	}
+	
 	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows,
 		rows, cols, RectState::Susceptible);
 	ContagionGrid->Children->Append(InfectiousGrid->GetView());
@@ -124,18 +135,15 @@ void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType typ
 /// <returns></returns>
 void AlgorithmVisualization::ContagionPage::GetThisState()
 {
-	auto res = ref new Vector<IVector<RectState>^>(InfectiousGrid->cols);
 	for (int i = 0; i < InfectiousGrid->cols; i++)
 	{
-		auto resRow = ref new Vector<RectState>(InfectiousGrid->rows);
 		for (int j = 0; j < InfectiousGrid->rows; j++)
 		{
-			resRow->SetAt(j, InfectiousGrid->Get(i, j)->CurrentState);
+			auto state = InfectiousGrid->Get(i, j)->CurrentState;
+			ThisStateVector[i][j] = state;
+			NextStateVector[i][j] = state;
 		}
-		res->SetAt(i, resRow);
 	}
-	NextStateVector = res;
-	ThisStateVector = Util::Copy2DVector(res);
 }
 
 /// <summary>
@@ -149,7 +157,7 @@ void AlgorithmVisualization::ContagionPage::LoadNextState()
 		{
 			if (this == nullptr || InfectiousGrid == nullptr) return;
 			if (((App^)Application::Current)->contagionAlgorithmType == -1) return;
-			auto state = NextStateVector->GetAt(i)->GetAt(j);
+			auto state = NextStateVector[i][j];
 			InfectiousGrid->SetState(i, j, state);
 		}
 	}
@@ -181,6 +189,8 @@ void AlgorithmVisualization::ContagionPage::InitSISModel()
 	Introduction->Text = L"SIS传播模型在SI模型基础上加入康复的概率，即治愈率。该模型适用于只有易感者和患病者两类人群，但会反复发作的疾病。易感者与患病者有效接触即被感染，变为患病者，可被治愈再次变为易感者，无潜伏期、无免疫力。";
 	FitInfectiousDisease->Text = L"适用于：细菌性痢疾";
 
+	RecoveryRate = 0.08;
+
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -194,6 +204,8 @@ void AlgorithmVisualization::ContagionPage::InitSIRModel()
 	NavToNextStep = &ContagionPage::SIRNextStep;
 	Introduction->Text = L"适用于有易感者、患病者和康复者三类人群，治愈后不会再发的疾病。康复者具有很强免疫力，不会被再次感染。对于致死性的传染病也可以使用这个模型，死亡的病人也可以归入康复者。此时的康复者可以理解为退出了传染系统。";
 	FitInfectiousDisease->Text = L"适用于：水痘";
+	
+	RecoveryRate = 0.08;
 
 	ExposedToInfectiousBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
@@ -209,6 +221,8 @@ void AlgorithmVisualization::ContagionPage::InitSEIRModel()
 	Introduction->Text = L"许多疾病存在潜伏期，在此期间个人不能感染其它人并有一定概率转化为感染者。在此类模型中，个体经历了较长的潜伏期，因此个体已被感染但尚未具有传染力。该模型在SIR模型中增加了E（暴露者）用于表示处于潜伏期的个体。";
 	FitInfectiousDisease->Text = L"适用于：登革热";
 
+	RecoveryRate = 0.05;
+
 	ExposedToAsymptomaticBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 	AsymptomaticRecoveryBox->Visibility = Windows::UI::Xaml::Visibility::Collapsed;
 }
@@ -221,6 +235,8 @@ void AlgorithmVisualization::ContagionPage::InitSEIARModel()
 	NavToNextStep = &ContagionPage::SEIARNextStep;
 	Introduction->Text = L"部分疾病存在具有传染性的无症状感染者，无症状意味着这类人群可能无法察觉自己患病进而无法及时就医，造成更大的人口流动性和更低的康复率。在SEIAR模型中，引入了无症状感染者A，把SEIR模型中的I进一步分为I和A。";
 	FitInfectiousDisease->Text = L"适用于：2019-nCov 新型冠状病毒肺炎";
+
+	RecoveryRate = 0.05;
 }
 
 /// <summary>
@@ -373,9 +389,9 @@ void AlgorithmVisualization::ContagionPage::SEIARNextStep()
 RectState AlgorithmVisualization::ContagionPage::GetState(int x, int y, bool next)
 {
 	if (next)
-		return NextStateVector->GetAt(x)->GetAt(y);
+		return NextStateVector[x][y];
 	else
-		return ThisStateVector->GetAt(x)->GetAt(y);
+		return ThisStateVector[x][y];
 }
 
 /// <summary>
@@ -387,9 +403,9 @@ RectState AlgorithmVisualization::ContagionPage::GetState(int x, int y, bool nex
 void AlgorithmVisualization::ContagionPage::SetState(int x, int y, RectState newState, bool next)
 {
 	if (next)
-		NextStateVector->GetAt(x)->SetAt(y, newState);
+		NextStateVector[x][y] = newState;
 	else
-		ThisStateVector->GetAt(x)->SetAt(y, newState);
+		ThisStateVector[x][y] = newState;
 }
 
 /// <summary>
