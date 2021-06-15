@@ -50,7 +50,7 @@ namespace AlgorithmVisualization {
 		Color InfectiousColor = Colors::Red; //感染者颜色
 		Color RecoveredColor = Colors::Green; //康复者颜色
 		Color ExposedColor = Colors::Yellow; //潜伏者颜色
-		Color AsymptomaticColor = Colors::Purple; //无症状感染者颜色
+		Color AsymptomaticColor = Colors::DeepSkyBlue; //无症状感染者颜色
 	};
 	
 	/// <summary>

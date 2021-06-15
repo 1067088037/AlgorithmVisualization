@@ -16,7 +16,7 @@
 
         <StackPanel x:Name="ContagionGridStack" Grid.Row="0" Grid.Column="0" Margin="6">
             <TextBlock FontSize="24" Margin="6">网格图</TextBlock>
-            <Button x:Name="DebugBtn" Content="调试" Click="DebugBtn_Click"  Margin="12"></Button>
+            <!--<Button x:Name="DebugBtn" Content="调试" Click="DebugBtn_Click"  Margin="12"></Button>-->
             <StackPanel x:Name="ContagionGrid" 
                                         Margin="6" 
                                         Orientation="Vertical" 
@@ -45,7 +45,7 @@
                         <TextBlock TextAlignment="Center" Margin="6">E-潜伏者</TextBlock>
                     </StackPanel>
                     <StackPanel Margin="12">
-                        <Rectangle Width="50" Height="50" Fill="Purple"></Rectangle>
+                        <Rectangle Width="50" Height="50" Fill="DeepSkyBlue"></Rectangle>
                         <TextBlock TextAlignment="Center" Margin="6">A-无症状</TextBlock>
                     </StackPanel>
                 </StackPanel>
