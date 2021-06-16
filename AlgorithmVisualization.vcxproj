@@ -125,7 +125,7 @@
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxPackageDir>D:\VisualStudioProjects\AppPackages\AlgorithmVisualization\</AppxPackageDir>
-    <PackageCertificateThumbprint>ADB7301D773CB6DAC77473A8731F3D3B1B29EA29</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>DB56063414036AB6EADB4B8C29F777994F1541D9</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

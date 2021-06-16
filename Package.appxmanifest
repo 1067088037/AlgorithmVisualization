@@ -8,10 +8,10 @@
 
   <Identity
     Name="52897Summer-lights.34423B707E245"
-    Publisher="CN=Summer-lights"
-    Version="1.1.1.0" />
+    Publisher="CN=40F3F223-D910-44D2-8027-FD5A474C043A"
+    Version="1.1.2.0" />
 
-  <mp:PhoneIdentity PhoneProductId="910618dd-05c8-4f17-8a42-84a15b3a70b0" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="04303799-59a1-41fd-a9fe-519cc9c3632e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>算法可视化</DisplayName>
