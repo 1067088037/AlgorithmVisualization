@@ -14,5 +14,8 @@
             <TextBlock FontSize="18" Margin="12" TextWrapping="Wrap">将抽象的算法通过易于理解的可视化呈现在学习者的眼前</TextBlock>
         </StackPanel>
         <Image Source="Assets/Logo.png" Height="350" Width="350" Stretch="Uniform"></Image>
+        <TextBlock FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="12">
+            Copyright © 2021 Summer-lights. All Rights Reserved
+        </TextBlock>
     </Grid>
 </Page>
