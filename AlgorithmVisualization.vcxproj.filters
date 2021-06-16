@@ -214,6 +214,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Package.StoreAssociation.xml" />
+    <None Include="AlgorithmVisualization_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AlgorithmVisualization.rc" />
