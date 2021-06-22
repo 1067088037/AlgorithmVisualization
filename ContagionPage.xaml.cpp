@@ -77,11 +77,11 @@ void AlgorithmVisualization::ContagionPage::DebugBtn_Click(Platform::Object^ sen
 /// <param name="type"></param>
 void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType type)
 {
-	StopTimer();
-	Next->IsEnabled = true;
-	StartOrPause->Content = L"开始";
+	StopTimer(); //关闭计时器
+	Next->IsEnabled = true; //允许点击下一步
+	StartOrPause->Content = L"开始"; //修改按钮名称为开始
 
-	ContagionGrid->Children->Clear();
+	ContagionGrid->Children->Clear(); //清空网格图内容
 	int rows = 30;
 	int cols = 60;
 
@@ -96,10 +96,10 @@ void AlgorithmVisualization::ContagionPage::InitAlgorithm(ContagionModelType typ
 	}
 	
 	InfectiousGrid = ref new Grid(lastGridWidth, lastGridWidth / cols * rows,
-		rows, cols, RectState::Susceptible);
-	ContagionGrid->Children->Append(InfectiousGrid->GetView());
+		rows, cols, RectState::Susceptible); //生成传染病网格
+	ContagionGrid->Children->Append(InfectiousGrid->GetView()); //插入到网格图向量末尾
 
-	InfectiousGrid->GetCenter()->ChangeState(RectState::Infectious);
+	InfectiousGrid->GetCenter()->ChangeState(RectState::Infectious); //设置中间的方格为感染的
 	GetThisState();
 
 	switch (type)
@@ -139,9 +139,9 @@ void AlgorithmVisualization::ContagionPage::GetThisState()
 	{
 		for (int j = 0; j < InfectiousGrid->rows; j++)
 		{
-			auto state = InfectiousGrid->Get(i, j)->CurrentState;
-			ThisStateVector[i][j] = state;
-			NextStateVector[i][j] = state;
+			auto state = InfectiousGrid->Get(i, j)->CurrentState; //获取当前步骤
+			ThisStateVector[i][j] = state; //设置当前步骤
+			NextStateVector[i][j] = state; //设置下一步
 		}
 	}
 }
@@ -249,7 +249,7 @@ void AlgorithmVisualization::ContagionPage::SINextStep()
 		for (int j = 0; j < yMax; j++)
 		{
 			if (GetState(i, j, false) == RectState::Infectious) //如果感染则可以传染给别人
-				InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate);
+				InfectNear(i, j, ContactPeopleCount / 10, InfectiousRate); //传染给周围的人
 		}
 	}
 }
@@ -442,9 +442,9 @@ void AlgorithmVisualization::ContagionPage::ChangeNear(int srcX, int srcY, int c
 	for (unsigned int i = 0; i < nearPeople->Size; ++i)
 	{
 		auto people = nearPeople->GetAt(i);
-		if (GetState(people->x, people->y) == from && random(e) <= probability)
+		if (GetState(people->x, people->y) == from && random(e) <= probability) //如果满足改变状态的条件
 		{
-			SetState(people->x, people->y, to, true);
+			SetState(people->x, people->y, to, true); //改变状态
 		}
 	}
 }
@@ -534,8 +534,8 @@ void AlgorithmVisualization::ContagionPage::StopTimer()
 {
 	if (ThreadTimer != nullptr)
 	{
-		ThreadTimer->Cancel();
-		ThreadTimer = nullptr;
+		ThreadTimer->Cancel(); //取消计时器
+		ThreadTimer = nullptr; //设置计时器为空
 	}
 }
 
@@ -558,10 +558,11 @@ void AlgorithmVisualization::ContagionPage::Next_Click(Platform::Object^ sender,
 /// <param name="e"></param>
 void AlgorithmVisualization::ContagionPage::TimeElapseSpeedSlider_ValueChanged(Platform::Object^ sender, Windows::UI::Xaml::Controls::Primitives::RangeBaseValueChangedEventArgs^ e)
 {
-	Speed = (int64)(e->NewValue * 1000);
-	TimeElapseSpeedText->Text = e->NewValue + L"s";
+	Speed = (int64)(e->NewValue * 1000); //计算出速度
+	TimeElapseSpeedText->Text = e->NewValue + L"s"; //设置速度的文字
 	if (IsTimerRunning())
 	{
+		//重启计时器
 		StopTimer();
 		StartTimer();
 	}

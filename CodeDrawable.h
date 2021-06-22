@@ -15,7 +15,7 @@ namespace AlgorithmVisualization {
 	ref class CodeDrawable sealed
 	{
 	public:
-		CodeDrawable();
+		CodeDrawable(); //构造函数
 		IVector<Object^>^ GenerateDrawable(int highLightLine); //生成可绘制的代码
 		IVector<Object^>^ GenerateDrawable(IVector<int>^ highLightLines); //生成可绘制的代码
 

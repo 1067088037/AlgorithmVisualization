@@ -707,6 +707,14 @@ bool AlgorithmVisualization::SortAlgoPage::AddSwapStep(int leftHisIndex, int lef
 	return true;
 }
 
+/// <summary>
+/// 设置为默认状态
+/// </summary>
+/// <param name="his0"></param>
+/// <param name="index0"></param>
+/// <param name="his1"></param>
+/// <param name="index1"></param>
+/// <returns></returns>
 bool AlgorithmVisualization::SortAlgoPage::SetToDefault(int his0, int index0, int his1, int index1)
 {
 	//获取合适的状态向量

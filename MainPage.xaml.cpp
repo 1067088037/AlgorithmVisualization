@@ -29,7 +29,11 @@ MainPage::MainPage()
 	InitializeComponent();
 }
 
-// 主页导航加载完成时回调
+/// <summary>
+/// 主页导航加载完成时回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="e"></param>
 void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
 {
 	MainNavView->SelectedItem = MainNavView->MenuItems->GetAt(0);
@@ -41,7 +45,11 @@ void AlgorithmVisualization::MainPage::MainNavView_Loaded(Platform::Object^ send
 	//((App^)Application::Current)->sortAlgorithmType = 0;
 }
 
-// 主页导航的Item被点击时回调
+/// <summary>
+/// 主页导航的Item被点击时回调
+/// </summary>
+/// <param name="sender"></param>
+/// <param name="args"></param>
 void AlgorithmVisualization::MainPage::MainNavView_ItemInvoked(Windows::UI::Xaml::Controls::NavigationView^ sender, Windows::UI::Xaml::Controls::NavigationViewItemInvokedEventArgs^ args)
 {
 	((App^)Application::Current)->sortAlgorithmType = -1;
