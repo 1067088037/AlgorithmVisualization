@@ -12,7 +12,7 @@
 
 [算法可视化 - Microsoft Store zh-CN](https://www.microsoft.com/zh-cn/p/算法可视化/9mvgxjkpmcvm?rtc=1&activetab=pivot:overviewtab)
 
-![image-20210625094433149](Public\Images\image-20210625094433149.png)
+![image-20210625094433149](./Public/Images/image-20210625094433149.png)
 
 ## 可演示的算法
 
